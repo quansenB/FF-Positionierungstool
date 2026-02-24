@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Positionierungs-Check</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --highlight: #e55d3c;
+  --highlight-light: rgba(229, 93, 60, 0.08);
+  --highlight-glow: rgba(229, 93, 60, 0.15);
+  --text: #1c1c1e;
+  --text-dim: #6b6b70;
+  --white: #fbfbfb;
+  --beige: #f2f1f0;
+  --border: #e0dfdd;
+  --surface: #ffffff;
+}
+
+html { font-size: 16px; }
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: var(--beige);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app { max-width: 640px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+
+.header { padding: 2rem 1.5rem 1.5rem; text-align: center; }
+.header-logo { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.1rem; color: var(--text); letter-spacing: -0.02em; }
+.header-logo span { color: var(--highlight); }
+
+.progress-wrap { padding: 0 1.5rem; margin-bottom: 0.5rem; }
+.progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--highlight); border-radius: 2px; transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.progress-label { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.5rem; font-weight: 500; }
+
+.screen { display: none; flex: 1; padding: 1.5rem; animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.screen.active { display: flex; flex-direction: column; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Intro */
+.intro { justify-content: center; align-items: center; text-align: center; padding-top: 0; flex: 1; }
+.intro-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; background: var(--highlight-light); color: var(--highlight); border-radius: 100px; font-size: 0.78rem; font-weight: 600; margin-bottom: 1.5rem; }
+.intro h1 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.03em; margin-bottom: 1rem; max-width: 480px; }
+.intro h1 em { font-style: italic; color: var(--highlight); }
+.intro p { font-size: 1rem; color: var(--text-dim); line-height: 1.6; max-width: 420px; margin-bottom: 2.5rem; }
+.intro-features { display: flex; gap: 1.5rem; margin-bottom: 2.5rem; font-size: 0.82rem; color: var(--text-dim); }
+.intro-features div { display: flex; align-items: center; gap: 0.4rem; }
+.intro-features svg { color: var(--highlight); flex-shrink: 0; }
+
+/* Questions */
+.question-num { font-size: 0.75rem; font-weight: 600; color: var(--highlight); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+.question-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+.question-sub { font-size: 0.88rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 1.5rem; }
+
+/* Inputs */
+.input-text { width: 100%; padding: 0.9rem 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 0.95rem; color: var(--text); background: var(--surface); transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
+.input-text:focus { border-color: var(--highlight); box-shadow: 0 0 0 3px var(--highlight-glow); }
+.input-text::placeholder { color: #b5b3b0; }
+textarea.input-text { resize: vertical; min-height: 100px; }
+
+/* Range chips */
+.range-options { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.range-chip { padding: 0.65rem 1.1rem; border: 1.5px solid var(--border); border-radius: 100px; background: var(--surface); cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; user-select: none; }
+.range-chip:hover { border-color: #c8c6c3; }
+.range-chip.selected { border-color: var(--highlight); background: var(--highlight); color: white; }
+
+/* Buttons */
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem 1.8rem; background: var(--highlight); color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary:hover { background: #d14e30; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-secondary { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1rem; background: none; border: none; color: var(--text-dim); font-family: inherit; font-size: 0.85rem; cursor: pointer; transition: color 0.2s; }
+.btn-secondary:hover { color: var(--text); }
+.nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 2rem; }
+
+/* ============ RESULT SCREEN ============ */
+.result-header { text-align: center; margin-bottom: 2rem; }
+.result-header h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+.result-header p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.5; }
+
+/* Concept explanation */
+.concept-box {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1.3rem;
+  margin-bottom: 1.5rem;
+}
+.concept-box h3 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+.concept-box p {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 0.8rem;
+}
+.concept-box p:last-child { margin-bottom: 0; }
+
+/* Commitment bar */
+.commitment-bar {
+  display: flex;
+  align-items: stretch;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0 0.4rem;
+  height: 32px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.commitment-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  white-space: nowrap;
+  padding: 0 0.5rem;
+}
+.commitment-seg:nth-child(1) { background: #c4d4c0; color: var(--text); flex: 1; }
+.commitment-seg:nth-child(2) { background: #e8c86a; color: var(--text); flex: 1; }
+.commitment-seg:nth-child(3) { background: #e5873c; flex: 1.3; }
+.commitment-seg:nth-child(4) { background: var(--highlight); flex: 1; }
+.commitment-labels {
+  display: flex;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  margin-bottom: 0.2rem;
+}
+.commitment-labels span { flex: 1; text-align: center; }
+.commitment-labels span:nth-child(3) { flex: 1.3; }
+
+/* Stage accordion dropdowns */
+.stage-explain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.stage-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.stage-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: inherit;
+  color: var(--text);
+  text-align: left;
+  transition: background 0.15s;
+}
+.stage-toggle:hover { background: var(--beige); }
+.stage-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--beige);
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+.stage-toggle h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex: 1;
+}
+.stage-price-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: var(--beige);
+  padding: 0.18rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.stage-chevron {
+  width: 18px;
+  height: 18px;
+  color: var(--text-dim);
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+.stage-card.open .stage-chevron { transform: rotate(180deg); }
+.stage-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0 1rem;
+}
+.stage-card.open .stage-body {
+  max-height: 200px;
+  padding: 0 1rem 1rem;
+}
+.stage-body p {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
+/* Ladder visual */
+.ladder { position: relative; display: flex; flex-direction: column; margin-bottom: 0.5rem; }
+.ladder-line { position: absolute; left: 23px; top: 36px; bottom: 36px; width: 2px; background: var(--border); z-index: 0; }
+.ladder-step { display: flex; gap: 1rem; position: relative; z-index: 1; padding: 0.75rem 0; }
+.ladder-dot-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 48px; }
+.ladder-dot { width: 12px; height: 12px; border-radius: 50%; border: 2.5px solid var(--border); background: var(--beige); margin-top: 6px; }
+.ladder-step.visible .ladder-dot { border-color: var(--highlight); background: var(--highlight); box-shadow: 0 0 0 4px var(--highlight-glow); }
+.ladder-content { flex: 1; min-width: 0; }
+.ladder-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 0.25rem; }
+.ladder-step.visible .ladder-label { color: var(--highlight); }
+
+.ladder-card { padding: 1rem 1.1rem; border: 1.5px solid var(--border); border-radius: 10px; background: var(--surface); }
+.ladder-step.visible .ladder-card { border-color: var(--highlight); background: white; box-shadow: 0 2px 12px rgba(229, 93, 60, 0.08); }
+.ladder-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; }
+.ladder-card p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; }
+.ladder-price { display: inline-block; margin-top: 0.6rem; padding: 0.3rem 0.7rem; background: var(--highlight-light); color: var(--highlight); border-radius: 6px; font-size: 0.8rem; font-weight: 700; }
+.ladder-step.visible .ladder-price { background: var(--highlight); color: white; }
+
+.ladder-step.locked .ladder-card { filter: blur(6px); user-select: none; pointer-events: none; }
+.ladder-step.locked .ladder-label { filter: blur(4px); }
+
+/* Opt-in wall */
+.optin-wall { position: relative; margin-top: -0.5rem; padding: 2rem 1.5rem; background: linear-gradient(180deg, transparent 0%, var(--beige) 20%, var(--beige) 100%); text-align: center; }
+.optin-box { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 2rem 1.5rem; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+.optin-lock { width: 44px; height: 44px; background: var(--highlight-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+.optin-box h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 0.4rem; }
+.optin-box > p { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 1.25rem; max-width: 360px; margin-left: auto; margin-right: auto; }
+.optin-input-row { display: flex; gap: 0.5rem; max-width: 400px; margin: 0 auto; }
+.optin-input-row input { flex: 1; padding: 0.8rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.9rem; outline: none; background: var(--white); }
+.optin-input-row input:focus { border-color: var(--highlight); box-shadow: 0 0 0 3px var(--highlight-glow); }
+.optin-input-row .btn-primary { flex-shrink: 0; padding: 0.8rem 1.4rem; border-radius: 8px; font-size: 0.88rem; }
+.optin-trust { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.75rem; }
+.optin-trust svg { vertical-align: -2px; margin-right: 2px; }
+
+.result-unlocked { display: none; text-align: center; padding: 1.5rem; }
+.result-unlocked.active { display: block; }
+.unlocked-msg { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; background: #e8f5e9; color: #2e7d32; border-radius: 100px; font-size: 0.82rem; font-weight: 600; margin-bottom: 1.5rem; }
+
+.result-cta { margin-top: 2rem; padding: 1.5rem; background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; text-align: center; }
+.result-cta h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.4rem; }
+.result-cta p { font-size: 0.82rem; color: var(--text-dim); margin-bottom: 1rem; }
+
+/* Yes/No cards */
+.yesno-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.yesno-card { padding: 1.5rem 1rem; border: 1.5px solid var(--border); border-radius: 12px; background: var(--surface); text-align: center; cursor: pointer; transition: all 0.2s; user-select: none; }
+.yesno-card:hover { border-color: #c8c6c3; }
+.yesno-card.selected { border-color: var(--highlight); background: var(--highlight-light); }
+.yesno-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+.yesno-label { font-weight: 600; font-size: 0.95rem; }
+.yesno-sub { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+/* Section divider */
+.section-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin: 1.5rem 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 480px) {
+  .intro h1 { font-size: 1.6rem; }
+  .intro-features { flex-direction: column; gap: 0.6rem; align-items: center; }
+  .question-title { font-size: 1.3rem; }
+  .optin-input-row { flex-direction: column; }
+  .range-options { gap: 0.4rem; }
+  .range-chip { padding: 0.55rem 0.9rem; font-size: 0.8rem; }
+  .commitment-bar { font-size: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <div class="header">
+    <div class="header-logo">Dein<span>Positionierungs</span>Check</div>
+  </div>
+
+  <div class="progress-wrap" id="progressWrap" style="display:none;">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-label" id="progressLabel">Frage 1 von 7</div>
+  </div>
+
+  <!-- ==================== INTRO ==================== -->
+  <div class="screen active" id="screen-intro">
+    <div class="intro">
+      <div class="intro-badge">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Kostenlos · 2 Minuten
+      </div>
+      <h1>Finde deine <em>Positionierung</em> als Freelancer</h1>
+      <p>7 Fragen. Dein individueller Entwurf für eine Angebotsleiter, mit der du planbarer verkaufst und höhere Preise durchsetzt.</p>
+      <div class="intro-features">
+        <div>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Stärken erkennen
+        </div>
+        <div>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Angebotsleiter bauen
+        </div>
+        <div>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sofort umsetzbar
+        </div>
+      </div>
+      <button class="btn-primary" onclick="startQuiz()">
+        Jetzt starten
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== Q1 ==================== -->
+  <div class="screen" id="screen-q1">
+    <div class="question-num">Frage 1 von 7</div>
+    <div class="question-title">Was ist deine Hauptdienstleistung?</div>
+    <div class="question-sub">Die eine Sache, mit der du den Großteil deines Umsatzes machst.</div>
+    <input type="text" class="input-text" id="q1" placeholder="z.B. Webdesign, Copywriting, Performance Marketing...">
+    <div class="nav-row">
+      <button class="btn-secondary" onclick="goTo('screen-intro')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Zurück</button>
+      <button class="btn-primary" onclick="goTo('screen-q2')">Weiter</button>
+    </div>
+  </div>
+
+  <!-- ==================== Q2 ==================== -->
+  <div class="screen" id="screen-q2">
+    <div class="question-num">Frage 2 von 7</div>
+    <div class="question-title">Was sagen Kunden, warum sie dich weiterempfehlen?</div>
+    <div class="question-sub">Der eine Satz, den dein bester Kunde über dich sagen würde.</div>
+    <input type="text" class="input-text" id="q2" placeholder='z.B. "Er liefert schnell und denkt mit."'>
+    <div class="nav-row">
+      <button class="btn-secondary" onclick="goTo('screen-q1')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Zurück</button>
+      <button class="btn-primary" onclick="goTo('screen-q3')">Weiter</button>
+    </div>
+  </div>
+
+  <!-- ==================== Q3 ==================== -->
+  <div class="screen" id="screen-q3">
+    <div class="question-num">Frage 3 von 7</div>
+    <div class="question-title">Worin bist du besser als 90% deiner Mitbewerber?</div>
+    <div class="question-sub">Dein unfairer Vorteil. Das, was dich wirklich unterscheidet.</div>
+    <input type="text" class="input-text" id="q3" placeholder="z.B. Branchenexpertise im E-Commerce, schnelle Umsetzung...">
+    <div class="nav-row">
+      <button class="btn-secondary" onclick="goTo('screen-q2')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Zurück</button>
+      <button class="btn-primary" onclick="goTo('screen-q4')">Weiter</button>
+    </div>
+  </div>
+
+  <!-- ==================== Q4 ==================== -->
+  <div class="screen" id="screen-q4">
+    <div class="question-num">Frage 4 von 7</div>
+    <div class="question-title">Wer ist dein profitabelster Kundentyp?</div>
+    <div class="question-sub">Branche + Rolle. Wer zahlt am meisten und macht am wenigsten Stress?</div>
+    <input type="text" class="input-text" id="q4" placeholder="z.B. E-Commerce-Unternehmer mit 1-5 Mio. Umsatz">
+    <div class="nav-row">
+      <button class="btn-secondary" onclick="goTo('screen-q3')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Zurück</button>
+      <button class="btn-primary" onclick="goTo('screen-q5')">Weiter</button>
+    </div>
+  </div>
+
+  <!-- ==================== Q5 ==================== -->
+  <div class="screen" id="screen-q5">
+    <div class="question-num">Frage 5 von 7</div>
+    <div class="question-title">Welches konkrete Problem löst du für diese Kunden?</div>
+    <div class="question-sub">Nicht was du tust, sondern welches Ergebnis du lieferst.</div>
+    <textarea class="input-text" id="q5" placeholder='z.B. "Meine Kunden haben zu wenig qualifizierte Leads und verlieren Umsatz an Wettbewerber mit besserer Online-Präsenz."'></textarea>
+    <div class="nav-row">
+      <button class="btn-secondary" onclick="goTo('screen-q4')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Zurück</button>
+      <button class="btn-primary" onclick="goTo('screen-q6')">Weiter</button>
+    </div>
+  </div>
+
+  <!-- ==================== Q6 ==================== -->
+  <div class="screen" id="screen-q6">
+    <div class="question-num">Frage 6 von 7</div>
+    <div class="question-title">Wie hoch ist dein aktueller Monatsumsatz?</div>
+    <div class="question-sub">Grobe Einordnung reicht. Damit passen wir die Preisempfehlung an.</div>
+    <div class="range-options" id="q6">
+      <div class="range-chip" onclick="selectChip(this,'q6')">Unter 3.000 €</div>
+      <div class="range-chip" onclick="selectChip(this,'q6')">3.000 – 5.000 €</div>
+      <div class="range-chip" onclick="selectChip(this,'q6')">5.000 – 10.000 €</div>
+      <div class="range-chip" onclick="selectChip(this,'q6')">10.000 – 20.000 €</div>
+      <div class="range-chip" onclick="selectChip(this,'q6')">Über 20.000 €</div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-secondary" onclick="goTo('screen-q5')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Zurück</button>
+      <button class="btn-primary" onclick="goTo('screen-q7')">Weiter</button>
+    </div>
+  </div>
+
+  <!-- ==================== Q7 ==================== -->
+  <div class="screen" id="screen-q7">
+    <div class="question-num">Frage 7 von 7</div>
+    <div class="question-title">Hast du ein klar definiertes Angebot mit festem Preis?</div>
+    <div class="question-sub">Kein Stundensatz, sondern ein Paket oder Festpreis-Angebot.</div>
+    <div class="yesno-grid" id="q7">
+      <div class="yesno-card" onclick="selectYesNo(this,'q7')">
+        <div class="yesno-icon">✓</div>
+        <div class="yesno-label">Ja</div>
+        <div class="yesno-sub">Ich habe klare Pakete</div>
+      </div>
+      <div class="yesno-card" onclick="selectYesNo(this,'q7')">
+        <div class="yesno-icon">✗</div>
+        <div class="yesno-label">Nein</div>
+        <div class="yesno-sub">Ich arbeite nach Stunden</div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-secondary" onclick="goTo('screen-q6')"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Zurück</button>
+      <button class="btn-primary" onclick="showResult()">
+        Ergebnis anzeigen
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== RESULT ==================== -->
+  <div class="screen" id="screen-result">
+
+    <div class="result-header">
+      <h2>Deine Positionierungsleiter</h2>
+      <p>So könnte eine durchdachte Angebotsstruktur für dich als <strong id="resultService">Freelancer</strong> aussehen.</p>
+    </div>
+
+    <!-- ===== CONCEPT EXPLANATION ===== -->
+    <div class="concept-box">
+      <h3>Was ist eine Angebotsleiter?</h3>
+      <p>Die meisten Freelancer verkaufen ein einziges Angebot und hoffen, dass der Kunde sofort Ja sagt. Das Problem: Der Kunde kennt dich nicht, vertraut dir nicht und hat keine Ahnung, ob du liefern kannst.</p>
+      <p>Die Angebotsleiter löst das. Du baust 4 Stufen auf, die das Commitment des Kunden schrittweise erhöhen. Vom kostenlosen Einstieg bis zur langfristigen Zusammenarbeit.</p>
+      
+      <div class="commitment-bar">
+        <div class="commitment-seg">Kostenlos</div>
+        <div class="commitment-seg">Fuß in die Tür</div>
+        <div class="commitment-seg">Hauptangebot</div>
+        <div class="commitment-seg">Retainer</div>
+      </div>
+      <div class="commitment-labels">
+        <span>Commitment 0–2</span>
+        <span>3–4</span>
+        <span>5–7</span>
+        <span>8–10</span>
+      </div>
+    </div>
+
+    <!-- ===== 4 STAGE EXPLANATIONS ===== -->
+    <div class="section-label">Die 4 Stufen erklärt</div>
+
+    <div class="stage-explain">
+      <div class="stage-card" onclick="toggleStage(this)">
+        <button class="stage-toggle">
+          <div class="stage-number">1</div>
+          <h4>Kostenloser Value</h4>
+          <div class="stage-price-tag">Kostenlos</div>
+          <svg class="stage-chevron" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="stage-body">
+          <p>Dein Einstieg in die Kundenbeziehung. Du gibst kostenlos echten Mehrwert, z.B. durch einen kurzen Audit, eine Analyse oder eine Consultation. Das Ziel: Vertrauen aufbauen und zeigen, dass du weißt, wovon du redest.</p>
+        </div>
+      </div>
+
+      <div class="stage-card" onclick="toggleStage(this)">
+        <button class="stage-toggle">
+          <div class="stage-number">2</div>
+          <h4>Fuß-in-die-Tür-Angebot</h4>
+          <div class="stage-price-tag" id="priceTag2">2.000 – 5.000 €</div>
+          <svg class="stage-chevron" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="stage-body">
+          <p>Der erste bezahlte Auftrag. Klein genug, dass es ein No-Brainer ist. Absicherung: Geld-zurück-Garantie bei Unzufriedenheit. Das eliminiert das letzte Zögern.</p>
+        </div>
+      </div>
+
+      <div class="stage-card" onclick="toggleStage(this)">
+        <button class="stage-toggle">
+          <div class="stage-number">3</div>
+          <h4>Hauptangebot</h4>
+          <div class="stage-price-tag" id="priceTag3">5.000 – 30.000 €</div>
+          <svg class="stage-chevron" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="stage-body">
+          <p>Dein Signature-Angebot mit dem größten Umsatzhebel. Der Kunde kennt dich bereits und vertraut dir. Ein Teil des Fuß-in-die-Tür-Angebots wird verrechnet, was den Umstieg erleichtert.</p>
+        </div>
+      </div>
+
+      <div class="stage-card" onclick="toggleStage(this)">
+        <button class="stage-toggle">
+          <div class="stage-number">4</div>
+          <h4>Retainer</h4>
+          <div class="stage-price-tag" id="priceTag4">100 – 10.000 €/Mo</div>
+          <svg class="stage-chevron" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="stage-body">
+          <p>Planbarer, wiederkehrender Umsatz. Monatliche Zusammenarbeit auf Basis des Hauptangebots. Absicherung: z.B. 6 Monate Bindung mit einem Monat gratis, Abbruch im ersten Monat möglich.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PERSONALIZED LADDER ===== -->
+    <div class="section-label">Dein persönlicher Entwurf</div>
+
+    <div class="ladder">
+      <div class="ladder-line"></div>
+
+      <!-- Step 1: VISIBLE (Fuß in die Tür) -->
+      <div class="ladder-step visible">
+        <div class="ladder-dot-wrap"><div class="ladder-dot"></div></div>
+        <div class="ladder-content">
+          <div class="ladder-label">Stufe 1 · Kostenloser Einstieg</div>
+          <div class="ladder-card">
+            <h4 id="resultStep1Title">Dein kostenloses Einstiegsangebot</h4>
+            <p id="resultStep1Desc">Wird basierend auf deinen Angaben generiert.</p>
+            <div class="ladder-price">Kostenlos</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: LOCKED -->
+      <div class="ladder-step locked" id="step2">
+        <div class="ladder-dot-wrap"><div class="ladder-dot"></div></div>
+        <div class="ladder-content">
+          <div class="ladder-label">Stufe 2 · Fuß-in-die-Tür-Angebot</div>
+          <div class="ladder-card">
+            <h4 id="resultStep2Title">Dein erster bezahlter Auftrag</h4>
+            <p id="resultStep2Desc">Ein klar definiertes Paket, das aus Interessenten zahlende Kunden macht.</p>
+            <div class="ladder-price" id="price2">ab 2.000 €</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: LOCKED -->
+      <div class="ladder-step locked" id="step3">
+        <div class="ladder-dot-wrap"><div class="ladder-dot"></div></div>
+        <div class="ladder-content">
+          <div class="ladder-label">Stufe 3 · Hauptangebot</div>
+          <div class="ladder-card">
+            <h4 id="resultStep3Title">Dein Premium-Angebot</h4>
+            <p id="resultStep3Desc">Dein Signature-Angebot mit dem größten Umsatzhebel.</p>
+            <div class="ladder-price" id="price3">ab 5.000 €</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: LOCKED -->
+      <div class="ladder-step locked" id="step4">
+        <div class="ladder-dot-wrap"><div class="ladder-dot"></div></div>
+        <div class="ladder-content">
+          <div class="ladder-label">Stufe 4 · Retainer</div>
+          <div class="ladder-card">
+            <h4 id="resultStep4Title">Laufende Zusammenarbeit</h4>
+            <p id="resultStep4Desc">Planbarer, wiederkehrender Umsatz jeden Monat.</p>
+            <div class="ladder-price" id="price4">ab 500 € / Monat</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPT-IN WALL -->
+    <div class="optin-wall" id="optinWall">
+      <div class="optin-box">
+        <div class="optin-lock">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#e55d3c" stroke-width="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#e55d3c" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Deine komplette Leiter freischalten</h3>
+        <p>Erhalte alle 4 Stufen mit konkreten Angebotsvorschlägen und Preisempfehlungen, individuell für dich als <strong id="optinServiceLabel">Freelancer</strong>.</p>
+        <div class="optin-input-row">
+          <input type="email" id="optinEmail" placeholder="deine@email.de">
+          <button class="btn-primary" onclick="unlockResult()">Freischalten</button>
+        </div>
+        <div class="optin-trust">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2"/></svg>
+          Kein Spam. Jederzeit abmeldbar.
+        </div>
+      </div>
+    </div>
+
+    <!-- UNLOCKED STATE -->
+    <div class="result-unlocked" id="unlockedMsg">
+      <div class="unlocked-msg">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M22 4L12 14.01l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Alle Stufen freigeschaltet
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="result-cta" id="resultCta" style="display:none;">
+      <h4>Willst du das Ganze umsetzen?</h4>
+      <p>In der Freelancer-Akademie zeige ich dir Schritt für Schritt, wie du diese Leiter aufbaust, bepreist und verkaufst.</p>
+      <button class="btn-primary">Mehr erfahren</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TOTAL_Q = 7;
+const qScreens = ['screen-q1','screen-q2','screen-q3','screen-q4','screen-q5','screen-q6','screen-q7'];
+
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const t = document.getElementById(screenId);
+  t.classList.remove('active');
+  void t.offsetWidth;
+  t.classList.add('active');
+
+  const idx = qScreens.indexOf(screenId);
+  const pw = document.getElementById('progressWrap');
+  if (idx >= 0) {
+    pw.style.display = 'block';
+    document.getElementById('progressFill').style.width = ((idx+1)/TOTAL_Q*100)+'%';
+    document.getElementById('progressLabel').textContent = `Frage ${idx+1} von ${TOTAL_Q}`;
+  } else {
+    pw.style.display = 'none';
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function startQuiz() { goTo('screen-q1'); }
+
+function toggleStage(el) {
+  el.classList.toggle('open');
+}
+
+function selectChip(el, gid) {
+  document.querySelectorAll('#'+gid+' .range-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectYesNo(el, gid) {
+  document.querySelectorAll('#'+gid+' .yesno-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function showResult() {
+  const service = document.getElementById('q1').value || 'Freelancing';
+  const usp = document.getElementById('q3').value || 'deine Expertise';
+  const target = document.getElementById('q4').value || 'deine Zielgruppe';
+  const problem = document.getElementById('q5').value || '';
+
+  // Pricing tiers based on revenue
+  const chip = document.querySelector('#q6 .range-chip.selected');
+  const rev = chip ? chip.textContent.trim() : '';
+  let p = { fidt: '2.000 – 3.500', main: '5.000 – 12.000', ret: '500 – 1.500', fidtTag: '2.000 – 5.000 €', mainTag: '5.000 – 30.000 €', retTag: '100 – 10.000 €/Mo' };
+  
+  if (rev.includes('Unter 3')) {
+    p = { fidt: '1.500 – 2.500', main: '3.000 – 8.000', ret: '300 – 800', fidtTag: '2.000 – 5.000 €', mainTag: '5.000 – 15.000 €', retTag: '300 – 2.000 €/Mo' };
+  } else if (rev.includes('3.000')) {
+    p = { fidt: '2.000 – 3.500', main: '5.000 – 12.000', ret: '500 – 1.500', fidtTag: '2.000 – 5.000 €', mainTag: '5.000 – 15.000 €', retTag: '500 – 2.500 €/Mo' };
+  } else if (rev.includes('5.000')) {
+    p = { fidt: '2.500 – 5.000', main: '8.000 – 20.000', ret: '1.000 – 3.000', fidtTag: '2.500 – 5.000 €', mainTag: '8.000 – 20.000 €', retTag: '1.000 – 5.000 €/Mo' };
+  } else if (rev.includes('10.000')) {
+    p = { fidt: '3.500 – 5.000', main: '10.000 – 25.000', ret: '2.000 – 5.000', fidtTag: '3.500 – 5.000 €', mainTag: '10.000 – 25.000 €', retTag: '2.000 – 7.500 €/Mo' };
+  } else if (rev.includes('20.000')) {
+    p = { fidt: '5.000+', main: '15.000 – 30.000', ret: '3.000 – 10.000', fidtTag: '5.000 € +', mainTag: '15.000 – 30.000 €', retTag: '3.000 – 10.000 €/Mo' };
+  }
+
+  // Header
+  document.getElementById('resultService').textContent = service + '-Freelancer';
+  document.getElementById('optinServiceLabel').textContent = service + '-Freelancer';
+
+  // Stage explanation price tags
+  document.getElementById('priceTag2').textContent = p.fidtTag;
+  document.getElementById('priceTag3').textContent = p.mainTag;
+  document.getElementById('priceTag4').textContent = p.retTag;
+
+  // Personalized Fuß-in-die-Tür (VISIBLE)
+  document.getElementById('resultStep1Title').textContent = 'Kostenloser ' + service + '-Quick-Check';
+  document.getElementById('resultStep1Desc').textContent =
+    'Ein 30-minütiger Kurz-Audit für ' + target + ', bei dem du in einem Call konkret aufzeigst, wo Potenzial liegt. Dein Hebel dabei: ' + usp + '. Das schafft Vertrauen und öffnet die Tür zum bezahlten Auftrag.';
+
+  // Locked steps (personalized but hidden)
+  document.getElementById('resultStep2Title').textContent = service + '-Sofort-Paket';
+  document.getElementById('resultStep2Desc').textContent =
+    'Ein klar definiertes Paket für ' + target + ', das die dringendsten Quick-Wins umsetzt. Preis: ' + p.fidt + ' €. Absicherung: Geld-zurück-Garantie bei Unzufriedenheit.';
+  document.getElementById('price2').textContent = p.fidt + ' €';
+
+  document.getElementById('resultStep3Title').textContent = service + '-Komplett-Lösung';
+  document.getElementById('resultStep3Desc').textContent =
+    'Dein Signature-Angebot, das den gesamten Transformationsprozess abbildet. Preis: ' + p.main + ' €. Der Betrag des Fuß-in-die-Tür-Angebots wird verrechnet.';
+  document.getElementById('price3').textContent = p.main + ' €';
+
+  document.getElementById('resultStep4Title').textContent = service + '-Retainer';
+  document.getElementById('resultStep4Desc').textContent =
+    'Laufende monatliche Betreuung für ' + target + '. Preis: ' + p.ret + ' € pro Monat. Bei 6 Monaten Bindung gibt es einen Monat gratis.';
+  document.getElementById('price4').textContent = p.ret + ' € / Monat';
+
+  goTo('screen-result');
+}
+
+function unlockResult() {
+  const email = document.getElementById('optinEmail').value;
+  if (!email || !email.includes('@')) {
+    document.getElementById('optinEmail').style.borderColor = '#e55d3c';
+    document.getElementById('optinEmail').style.animation = 'shake 0.4s ease';
+    setTimeout(() => document.getElementById('optinEmail').style.animation = '', 400);
+    return;
+  }
+  ['step2','step3','step4'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('locked');
+    el.classList.add('visible');
+  });
+  document.getElementById('optinWall').style.display = 'none';
+  document.getElementById('unlockedMsg').classList.add('active');
+  document.getElementById('resultCta').style.display = 'block';
+  window.scrollTo({top: document.querySelector('.section-label:last-of-type').offsetTop - 20, behavior:'smooth'});
+}
+</script>
+
+</body>
+</html>
