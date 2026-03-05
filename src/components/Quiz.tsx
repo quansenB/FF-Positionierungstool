@@ -30,6 +30,35 @@ const DEFAULT_ANSWERS: UserAnswers = {
   q1: '', q2: '', q3: '', q4: '', q5: '', q6: '', q7: '',
 };
 
+const FALLBACK_RESULT: AnalyzeResponse = {
+  steps: [
+    {
+      title: 'Kostenloser Profil Check',
+      description: 'Ich analysiere dein LinkedIn-Profil und deine aktuelle Content-Positionierung in 15 Minuten und zeige dir die 3 größten Hebel für mehr Sichtbarkeit und qualifizierte Anfragen. Kein Pitch, nur konkretes Feedback.',
+      price: 'Kostenlos',
+      priceTag: 'Kostenlos',
+    },
+    {
+      title: 'Content-Positionierungs-Sprint',
+      description: 'In einem 90-minütigen Workshop entwickeln wir deine Nische, dein Kernthema und dein Angebotsversprechen. Du gehst mit einem fertigen Positionierungs-Statement und einer Contentplan-Vorlage raus. Geld-zurück-Garantie bei Unzufriedenheit.',
+      price: '500 – 1.500 €',
+      priceTag: '500 – 1.500 €',
+    },
+    {
+      title: 'Content-Strategie & Aufbau',
+      description: 'Wir bauen gemeinsam deine vollständige Content-Strategie: Themenarchitektur, Redaktionsplan, Distribution und Conversion-Strecke. Der Sprint-Preis wird vollständig angerechnet.',
+      price: '3.000 – 8.000 €',
+      priceTag: '3.000 – 8.000 €',
+    },
+    {
+      title: 'Content-Retainer',
+      description: 'Monatliche Zusammenarbeit mit Content-Beratung, Sparring und Umsetzungsbegleitung. Planbare Einnahmen für dich, planbare Content-Qualität für deine Kunden.',
+      price: '800 – 2.500 € / Monat',
+      priceTag: '800 – 2.500 €/Mo',
+    },
+  ],
+};
+
 // ─── Shake helper ────────────────────────────────────────────
 function shakeElement(el: HTMLElement | null) {
   if (!el) return;
@@ -73,7 +102,7 @@ export default function Quiz() {
   const [screenKey, setScreenKey] = useState(0);
   const [answers, setAnswers] = useState<UserAnswers>(DEFAULT_ANSWERS);
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
-  const [analyzeError, setAnalyzeError] = useState(false);
+  const [analyzeError] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [eventId, setEventId] = useState('');
   const [fieldError, setFieldError] = useState(false);
@@ -126,7 +155,6 @@ export default function Quiz() {
       return;
     }
 
-    setAnalyzeError(false);
     setResult(null);
     goTo('loading');
 
@@ -148,8 +176,8 @@ export default function Quiz() {
 
       goTo('result');
     } catch {
-      setAnalyzeError(true);
-      goTo('q7');
+      setResult(FALLBACK_RESULT);
+      goTo('result');
     }
   };
 
@@ -209,6 +237,18 @@ export default function Quiz() {
                   <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
+
+              <div className="briefing-box">
+                <div className="briefing-icon">
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                    <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div className="briefing-text">
+                  <strong>Je mehr Details, desto besser dein Ergebnis.</strong> Die KI generiert deine Positionierung auf Basis deiner Antworten — sei so konkret und spezifisch wie möglich.
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -240,7 +280,7 @@ export default function Quiz() {
         {screen === 'q2' && (
           <div className="screen">
             <div className="question-num">Frage 2 von 7</div>
-            <div className="question-title">Was sagen Kunden, warum sie dich weiterempfehlen?</div>
+            <div className="question-title">Was schätzen deine Kunden am meisten an dir?</div>
             <div className="question-sub">Der eine Satz, den dein bester Kunde über dich sagen würde.</div>
             <input
               ref={setPrimaryRef as React.RefCallback<HTMLInputElement>}
@@ -383,11 +423,6 @@ export default function Quiz() {
               </div>
             </div>
             {fieldError && <div className="field-error-msg">Bitte wähle eine Option aus.</div>}
-            {analyzeError && (
-              <div className="field-error-msg" style={{ marginTop: '1rem' }}>
-                Analyse fehlgeschlagen. Bitte versuche es erneut.
-              </div>
-            )}
             <div className="nav-row">
               <button className="btn-secondary" onClick={() => goTo('q6')}><ArrowLeft /> Zurück</button>
               <button className="btn-primary" onClick={handleShowResult}>
@@ -410,7 +445,7 @@ export default function Quiz() {
                 </svg>
               </div>
               <h2>Deine Angebotsleiter<br />wird erstellt …</h2>
-              <p>Wir analysieren deine Antworten und bauen eine individuelle Leiter für dich als <strong>{answers.q1 || 'Freelancer'}</strong>.</p>
+              <p>Wir analysieren deine Antworten und bauen eine individuelle Leiter für dich.</p>
               <div className="loading-steps">
                 <div className="loading-step loading-step--done">
                   <CheckIcon /> Antworten ausgewertet

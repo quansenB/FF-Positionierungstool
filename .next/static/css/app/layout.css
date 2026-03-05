@@ -50,9 +50,14 @@ body {
 .intro h1 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.03em; margin-bottom: 1rem; max-width: 480px; }
 .intro h1 em { font-style: italic; color: var(--highlight); }
 .intro p { font-size: 1rem; color: var(--text-dim); line-height: 1.6; max-width: 420px; margin-bottom: 2.5rem; }
-.intro-features { display: flex; gap: 1.5rem; margin-bottom: 2.5rem; font-size: 0.82rem; color: var(--text-dim); }
+.intro-features { display: flex; gap: 1.5rem; margin-bottom: 2rem; font-size: 0.82rem; color: var(--text-dim); }
 .intro-features div { display: flex; align-items: center; gap: 0.4rem; }
 .intro-features svg { color: var(--highlight); flex-shrink: 0; }
+
+.briefing-box { display: flex; align-items: flex-start; gap: 0.75rem; background: rgba(229,93,60,0.08); border: 1px solid rgba(229,93,60,0.25); border-radius: 10px; padding: 0.85rem 1rem; margin-top: 1.5rem; margin-bottom: 2rem; max-width: 480px; }
+.briefing-icon { color: var(--highlight); flex-shrink: 0; margin-top: 1px; }
+.briefing-text { font-size: 0.85rem; color: var(--text-dim); line-height: 1.55; }
+.briefing-text strong { color: var(--text); }
 
 /* Questions */
 .question-num { font-size: 0.75rem; font-weight: 600; color: var(--highlight); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
@@ -242,9 +247,10 @@ textarea.input-text { resize: vertical; min-height: 100px; }
 .ladder-step.locked .ladder-card { filter: blur(6px); -webkit-user-select: none; -moz-user-select: none; user-select: none; pointer-events: none; }
 .ladder-step.locked .ladder-label { filter: blur(4px); }
 
-/* Opt-in wall */
-.optin-wall { position: relative; margin-top: -0.5rem; padding: 2rem 1.5rem; background: linear-gradient(180deg, transparent 0%, var(--beige) 20%, var(--beige) 100%); text-align: center; }
-.optin-box { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 2rem 1.5rem; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+/* Paywall overlay */
+.paywall-wrap { position: relative; }
+.paywall-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 0%, var(--beige) 28%, var(--beige) 100%); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 2rem; z-index: 5; }
+.optin-box { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 2rem 1.5rem; box-shadow: 0 4px 24px rgba(0,0,0,0.06); width: 100%; max-width: 480px; }
 .optin-lock { width: 44px; height: 44px; background: var(--highlight-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
 .optin-box h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 0.4rem; }
 .optin-box > p { font-size: 0.85rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 1.25rem; max-width: 360px; margin-left: auto; margin-right: auto; }
@@ -391,5 +397,6 @@ textarea.input-text { resize: vertical; min-height: 100px; }
   .range-options { gap: 0.4rem; }
   .range-chip { padding: 0.55rem 0.9rem; font-size: 0.8rem; }
   .commitment-bar { font-size: 0.6rem; }
+  .paywall-overlay { justify-content: flex-start; padding-top: 3rem; padding-bottom: 0; background: linear-gradient(to bottom, transparent 0%, var(--beige) 18%, var(--beige) 100%); }
 }
 

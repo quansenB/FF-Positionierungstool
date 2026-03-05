@@ -124,7 +124,7 @@ export default function ResultScreen({
       </div>
 
       {/* ── Stage Accordions ─────────────────────────────── */}
-      <div className="section-label">Die 4 Stufen erklärt</div>
+      {/* <div className="section-label">Die 4 Stufen erklärt</div>
       <div className="stage-explain">
         {STAGE_TITLES.map((title, i) => (
           <StageCard
@@ -135,7 +135,7 @@ export default function ResultScreen({
             description={STAGE_DESCRIPTIONS[i]}
           />
         ))}
-      </div>
+      </div> */}
 
       {/* ── Personalized Ladder ─────────────────────────── */}
       <div className="section-label">Dein persönlicher Entwurf</div>
@@ -174,83 +174,84 @@ export default function ResultScreen({
               visible
             />
 
-            {/* Steps 2–4 – locked until opt-in */}
-            <LadderStep
-              label="Stufe 2 · Fuß-in-die-Tür-Angebot"
-              title={result.steps[1].title}
-              description={result.steps[1].description}
-              price={result.steps[1].price}
-              visible={isUnlocked}
-              locked={!isUnlocked}
-            />
-            <LadderStep
-              label="Stufe 3 · Hauptangebot"
-              title={result.steps[2].title}
-              description={result.steps[2].description}
-              price={result.steps[2].price}
-              visible={isUnlocked}
-              locked={!isUnlocked}
-            />
-            <LadderStep
-              label="Stufe 4 · Retainer"
-              title={result.steps[3].title}
-              description={result.steps[3].description}
-              price={result.steps[3].price}
-              visible={isUnlocked}
-              locked={!isUnlocked}
-            />
-          </div>
+            {/* Steps 2–4 with paywall overlay */}
+            <div className="paywall-wrap">
+              <LadderStep
+                label="Stufe 2 · Fuß-in-die-Tür-Angebot"
+                title={result.steps[1].title}
+                description={result.steps[1].description}
+                price={result.steps[1].price}
+                visible={isUnlocked}
+                locked={!isUnlocked}
+              />
+              <LadderStep
+                label="Stufe 3 · Hauptangebot"
+                title={result.steps[2].title}
+                description={result.steps[2].description}
+                price={result.steps[2].price}
+                visible={isUnlocked}
+                locked={!isUnlocked}
+              />
+              <LadderStep
+                label="Stufe 4 · Retainer"
+                title={result.steps[3].title}
+                description={result.steps[3].description}
+                price={result.steps[3].price}
+                visible={isUnlocked}
+                locked={!isUnlocked}
+              />
 
-          {/* ── Opt-in wall ─────────────────────────────── */}
-          {!isUnlocked && (
-            <div className="optin-wall">
-              <div className="optin-box">
-                <div className="optin-lock">
-                  <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-                    <rect x="3" y="11" width="18" height="11" rx="2" stroke="#e55d3c" strokeWidth="2" />
-                    <path d="M7 11V7a5 5 0 0110 0v4" stroke="#e55d3c" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
+              {!isUnlocked && (
+                <div className="paywall-overlay">
+                  <div className="optin-box">
+                    <div className="optin-lock">
+                      <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+                        <rect x="3" y="11" width="18" height="11" rx="2" stroke="#e55d3c" strokeWidth="2" />
+                        <path d="M7 11V7a5 5 0 0110 0v4" stroke="#e55d3c" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                    </div>
+                    <h3>Deine komplette Leiter freischalten</h3>
+                    <p>
+                      Erhalte alle 4 Stufen mit konkreten Angebotsvorschlägen und
+                      Preisempfehlungen, individuell für dich als{' '}
+                      <strong>{serviceLabel}</strong>.
+                    </p>
+                    <div className="optin-form">
+                      <input
+                        ref={emailRef}
+                        type="email"
+                        placeholder="Deine E-Mail-Adresse"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        style={emailError ? { borderColor: '#e55d3c' } : undefined}
+                      />
+                      <input
+                        ref={phoneRef}
+                        type="tel"
+                        placeholder="Deine Telefonnummer"
+                        value={phone}
+                        onChange={e => setPhone(e.target.value)}
+                        style={phoneError ? { borderColor: '#e55d3c' } : undefined}
+                      />
+                      <button
+                        className="btn-primary"
+                        onClick={handleUnlock}
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? 'Einen Moment …' : 'Freischalten'}
+                      </button>
+                    </div>
+                    <div className="optin-trust">
+                      <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" />
+                      </svg>
+                      Kein Spam. Jederzeit abmeldbar.
+                    </div>
+                  </div>
                 </div>
-                <h3>Deine komplette Leiter freischalten</h3>
-                <p>
-                  Erhalte alle 4 Stufen mit konkreten Angebotsvorschlägen und
-                  Preisempfehlungen, individuell für dich als{' '}
-                  <strong>{serviceLabel}</strong>.
-                </p>
-                <div className="optin-form">
-                  <input
-                    ref={emailRef}
-                    type="email"
-                    placeholder="Deine E-Mail-Adresse"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    style={emailError ? { borderColor: '#e55d3c' } : undefined}
-                  />
-                  <input
-                    ref={phoneRef}
-                    type="tel"
-                    placeholder="Deine Telefonnummer"
-                    value={phone}
-                    onChange={e => setPhone(e.target.value)}
-                    style={phoneError ? { borderColor: '#e55d3c' } : undefined}
-                  />
-                  <button
-                    className="btn-primary"
-                    onClick={handleUnlock}
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Einen Moment …' : 'Freischalten'}
-                  </button>
-                </div>
-                <div className="optin-trust">
-                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" />
-                  </svg>
-                  Kein Spam. Jederzeit abmeldbar.
-                </div>
-              </div>
+              )}
             </div>
-          )}
+          </div>
 
           {/* ── Unlocked confirmation ─────────────────────── */}
           {isUnlocked && (
