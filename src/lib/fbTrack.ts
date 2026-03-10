@@ -18,10 +18,14 @@ function generateEventId(): string {
 export function trackBrowserEvent(
   eventName: string,
   eventId: string,
+  userData?: { email?: string; phone?: string },
   data?: Record<string, unknown>,
 ): void {
   if (typeof window === 'undefined' || typeof window.fbq !== 'function') return;
-  window.fbq('track', eventName, data ?? {}, { eventID: eventId });
+  const payload: Record<string, unknown> = { ...data };
+  if (userData?.email) payload.em = userData.email;
+  if (userData?.phone) payload.ph = userData.phone;
+  window.fbq('track', eventName, payload, { eventID: eventId });
 }
 
 export async function trackServerEvent(
@@ -52,7 +56,7 @@ export function trackEvent(
   customData?: Record<string, unknown>,
 ): string {
   const eventId = generateEventId();
-  trackBrowserEvent(eventName, eventId, customData);
+  trackBrowserEvent(eventName, eventId, userData, customData);
   void trackServerEvent(eventName, eventId, userData, customData);
   return eventId;
 }

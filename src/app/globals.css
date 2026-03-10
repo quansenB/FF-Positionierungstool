@@ -65,7 +65,7 @@ body {
 .input-text { width: 100%; padding: 0.9rem 1rem; border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 0.95rem; color: var(--text); background: var(--surface); transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
 .input-text:focus { border-color: var(--highlight); box-shadow: 0 0 0 3px var(--highlight-glow); }
 .input-text::placeholder { color: #b5b3b0; }
-textarea.input-text { resize: vertical; min-height: 100px; }
+textarea.input-text { resize: vertical; min-height: 100px; padding-top: 0.6rem; }
 
 /* Range chips */
 .range-options { display: flex; gap: 0.5rem; flex-wrap: wrap; }

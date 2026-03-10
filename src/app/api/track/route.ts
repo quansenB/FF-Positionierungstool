@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
     req.headers.get('x-real-ip') ??
     undefined;
-
+  
   const clientUserAgent = req.headers.get('user-agent') ?? undefined;
   const eventSourceUrl = req.headers.get('referer') ?? undefined;
 

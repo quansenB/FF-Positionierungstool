@@ -176,7 +176,7 @@ export default function Quiz() {
       const data: AnalyzeResponse = await res.json();
       setResult(data);
 
-      trackEvent('QuizComplete', undefined, { service: answers.q1 });
+      trackEvent('QuizFinished', undefined, { service: answers.q1 });
 
       goTo('result');
     } catch {
