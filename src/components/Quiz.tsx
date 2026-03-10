@@ -112,8 +112,6 @@ export default function Quiz() {
   const setPrimaryRef = (el: HTMLElement | null) => { primaryEl.current = el; };
 
   useEffect(() => {
-    trackEvent('PageView');
-
     // Capture UTM params from URL
     const p = new URLSearchParams(window.location.search);
     const captured: UtmParams = {};

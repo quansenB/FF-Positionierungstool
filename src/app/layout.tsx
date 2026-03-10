@@ -34,6 +34,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             s.parentNode.insertBefore(t,s)}(window,document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '${pixelId}');
+            var _pvId = 'ev_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+            fbq('track', 'PageView', {}, { eventID: _pvId });
+            fetch('/api/track', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ eventName: 'PageView', eventId: _pvId })
+            });
           `}</Script>
         )}
       </body>
