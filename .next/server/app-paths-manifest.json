@@ -1,5 +1,0 @@
-{
-  "/api/submit-lead/route": "app/api/submit-lead/route.js",
-  "/api/track/route": "app/api/track/route.js",
-  "/page": "app/page.js"
-}
