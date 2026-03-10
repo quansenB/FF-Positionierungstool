@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
 import { checkRateLimit } from '@/lib/rateLimit';
 import type { UserAnswers, AnalyzeResponse } from '@/lib/types';
 
-const client = new Anthropic();
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY ?? '';
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL ?? 'anthropic/claude-opus-4-5';
 
 // ─── Pricing tiers (mirrors original JS logic, now server-side) ──────────────
 
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     req.headers.get('x-real-ip') ??
     'anonymous';
 
-  const { allowed, retryAfterMs } = checkRateLimit(ip, 5, 60_000);
+  const { allowed, retryAfterMs } = await checkRateLimit(ip);
   if (!allowed) {
     return NextResponse.json(
       { error: 'Zu viele Anfragen. Bitte warte kurz.' },
@@ -93,7 +93,6 @@ Erstelle basierend auf den Angaben unten eine **personalisierte Angebotsleiter**
 
 **Angaben:**
 - Hauptdienstleistung: ${answers.q1}
-- Was Kunden sagen / USP: ${answers.q2 || '(keine Angabe)'}
 - Differenzierung gegenüber Wettbewerbern: ${answers.q3 || '(keine Angabe)'}
 - Profitabelster Kundentyp: ${answers.q4 || '(keine Angabe)'}
 - Konkretes Problem, das gelöst wird: ${answers.q5 || '(keine Angabe)'}
@@ -136,21 +135,33 @@ Erstelle basierend auf den Angaben unten eine **personalisierte Angebotsleiter**
   ]
 }`;
 
-  // ── Call Claude ──
+  // ── Call OpenRouter ──
   try {
-    const message = await client.messages.create({
-      model: 'claude-opus-4-6',
-      max_tokens: 1024,
-      messages: [{ role: 'user', content: prompt }],
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: OPENROUTER_MODEL,
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: prompt }],
+      }),
     });
 
-    const block = message.content[0];
-    if (block.type !== 'text') {
-      throw new Error('Unexpected content type from Claude');
+    if (!response.ok) {
+      throw new Error(`OpenRouter API error: ${response.status}`);
+    }
+
+    const data = await response.json() as { choices: { message: { content: string } }[] };
+    const rawContent = data.choices?.[0]?.message?.content;
+    if (!rawContent) {
+      throw new Error('Empty response from OpenRouter');
     }
 
     // Strip potential markdown code fences
-    const rawText = block.text.replace(/```(?:json)?\n?/g, '').trim();
+    const rawText = rawContent.replace(/```(?:json)?\n?/g, '').trim();
     const result = JSON.parse(rawText) as AnalyzeResponse;
 
     // Validate shape
@@ -162,7 +173,7 @@ Erstelle basierend auf den Angaben unten eine **personalisierte Angebotsleiter**
              typeof s.price === 'string' && typeof s.priceTag === 'string',
       )
     ) {
-      throw new Error('Unexpected response shape from Claude');
+      throw new Error('Unexpected response shape from OpenRouter');
     }
 
     return NextResponse.json(result);

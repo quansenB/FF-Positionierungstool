@@ -51,7 +51,10 @@ export async function POST(req: NextRequest) {
   const clientUserAgent = req.headers.get('user-agent') ?? undefined;
   const eventSourceUrl = req.headers.get('referer') ?? undefined;
 
-  const payload = {
+  const testEventCode = process.env.FB_TEST_EVENT_CODE;
+
+  const payload: Record<string, unknown> = {
+    ...(testEventCode ? { test_event_code: testEventCode } : {}),
     data: [
       {
         event_name: eventName,

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Script from 'next/script';
 import type { AnalyzeResponse, UserAnswers } from '@/lib/types';
 import StageCard from './StageCard';
 
@@ -45,8 +46,6 @@ export default function ResultScreen({
   const emailRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
 
-  const service = answers.q1 || 'Freelancer';
-  const serviceLabel = `${service}-Freelancer`;
 
   // Price tags shown in accordion headers (generic fallback before AI result)
   const priceTags = result
@@ -90,8 +89,7 @@ export default function ResultScreen({
       <div className="result-header">
         <h2>Deine Positionierungsleiter</h2>
         <p>
-          So könnte eine durchdachte Angebotsstruktur für dich als{' '}
-          <strong>{serviceLabel}</strong> aussehen.
+          So könnte eine durchdachte Angebotsstruktur für dich aussehen.
         </p>
       </div>
 
@@ -213,8 +211,7 @@ export default function ResultScreen({
                     <h3>Deine komplette Leiter freischalten</h3>
                     <p>
                       Erhalte alle 4 Stufen mit konkreten Angebotsvorschlägen und
-                      Preisempfehlungen, individuell für dich als{' '}
-                      <strong>{serviceLabel}</strong>.
+                      Preisempfehlungen, individuell für dich.
                     </p>
                     <div className="optin-form">
                       <input
@@ -223,6 +220,7 @@ export default function ResultScreen({
                         placeholder="Deine E-Mail-Adresse"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleUnlock()}
                         style={emailError ? { borderColor: '#e55d3c' } : undefined}
                       />
                       <input
@@ -231,6 +229,7 @@ export default function ResultScreen({
                         placeholder="Deine Telefonnummer"
                         value={phone}
                         onChange={e => setPhone(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleUnlock()}
                         style={phoneError ? { borderColor: '#e55d3c' } : undefined}
                       />
                       <button
@@ -241,12 +240,12 @@ export default function ResultScreen({
                         {isSubmitting ? 'Einen Moment …' : 'Freischalten'}
                       </button>
                     </div>
-                    <div className="optin-trust">
+                    {/* <div className="optin-trust">
                       <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" />
                       </svg>
                       Kein Spam. Jederzeit abmeldbar.
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               )}
@@ -269,12 +268,22 @@ export default function ResultScreen({
           {/* ── CTA ──────────────────────────────────────── */}
           {isUnlocked && (
             <div className="result-cta">
-              <h4>Willst du das Ganze umsetzen?</h4>
+              <h4>Das war erst der Anfang.</h4>
               <p>
-                In der Freelancer-Akademie zeige ich dir Schritt für Schritt,
-                wie du diese Leiter aufbaust, bepreist und verkaufst.
+                Das ist natürlich eine automatisierte Auswertung. In einem
+                persönlichen Gespräch gehen wir noch mal tiefer rein – checken
+                alles gegen und schleifen deine Angebotsleiter auf deine
+                individuelle Situation fein.
               </p>
-              <button className="btn-primary">Mehr erfahren</button>
+              <div
+                className="calendly-inline-widget calendly-wrap"
+                data-url="https://calendly.com/finally-freelancing-analysegespraech/erstgespraech?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=ffffff"
+                style={{ minWidth: '320px', height: '700px' }}
+              />
+              <Script
+                src="https://assets.calendly.com/assets/external/widget.js"
+                strategy="lazyOnload"
+              />
             </div>
           )}
         </>

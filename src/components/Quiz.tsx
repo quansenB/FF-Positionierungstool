@@ -11,12 +11,12 @@ import ResultScreen from './result/ResultScreen';
 
 type Screen =
   | 'intro'
-  | 'q1' | 'q2' | 'q3' | 'q4' | 'q5' | 'q6' | 'q7'
+  | 'q1' | 'q3' | 'q4' | 'q5' | 'q6' | 'q7'
   | 'loading'
   | 'result';
 
-const Q_SCREENS: Screen[] = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7'];
-const TOTAL_Q = 7;
+const Q_SCREENS: Screen[] = ['q1', 'q3', 'q4', 'q5', 'q6', 'q7'];
+const TOTAL_Q = 6;
 
 const REVENUE_OPTIONS = [
   'Unter 3.000 €',
@@ -27,7 +27,7 @@ const REVENUE_OPTIONS = [
 ];
 
 const DEFAULT_ANSWERS: UserAnswers = {
-  q1: '', q2: '', q3: '', q4: '', q5: '', q6: '', q7: '',
+  q1: '', q2: '', q3: '', q4: '', q5: '', q6: '', q7: '', // q2 kept in type for API compat but not shown
 };
 
 const FALLBACK_RESULT: AnalyzeResponse = {
@@ -148,8 +148,9 @@ export default function Quiz() {
   };
 
   // ── Navigate to loading screen immediately, then fetch Claude ──
-  const handleShowResult = async () => {
-    if (!answers.q7) {
+  const handleShowResult = async (q7Override?: string) => {
+    const q7 = q7Override ?? answers.q7;
+    if (!q7) {
       setFieldError(true);
       shakeElement(primaryEl.current);
       return;
@@ -162,7 +163,7 @@ export default function Quiz() {
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(answers),
+        body: JSON.stringify({ ...answers, q7 }),
       });
 
       if (!res.ok) throw new Error(`${res.status}`);
@@ -199,6 +200,29 @@ export default function Quiz() {
       return false;
     }
   };
+
+  // ── Enter key → trigger Weiter ──────────────────────────────
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter') return;
+      // Don't fire on Shift+Enter (textarea line break)
+      if (e.shiftKey) return;
+      // Don't fire if a button already has focus (it handles its own click)
+      if (document.activeElement?.tagName === 'BUTTON') return;
+
+      switch (screen) {
+        case 'intro': goTo('q1'); break;
+        case 'q1': goToIfFilled(answers.q1, 'q3'); break;
+        case 'q3': goToIfFilled(answers.q3, 'q4'); break;
+        case 'q4': goToIfFilled(answers.q4, 'q5'); break;
+        case 'q5': e.preventDefault(); goToIfFilled(answers.q5, 'q6'); break;
+        case 'q6': goToIfSelected(answers.q6, 'q7'); break;
+        case 'q7': handleShowResult(); break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [screen, answers]);
 
   const progressIndex = Q_SCREENS.indexOf(screen as (typeof Q_SCREENS)[number]);
   const showProgress = progressIndex >= 0;
@@ -271,30 +295,7 @@ export default function Quiz() {
             {fieldError && <div className="field-error-msg">Bitte füll dieses Feld aus.</div>}
             <div className="nav-row">
               <button className="btn-secondary" onClick={() => goTo('intro')}><ArrowLeft /> Zurück</button>
-              <button className="btn-primary" onClick={() => goToIfFilled(answers.q1, 'q2')}>Weiter</button>
-            </div>
-          </div>
-        )}
-
-        {/* ── Q2 ── */}
-        {screen === 'q2' && (
-          <div className="screen">
-            <div className="question-num">Frage 2 von 7</div>
-            <div className="question-title">Was schätzen deine Kunden am meisten an dir?</div>
-            <div className="question-sub">Der eine Satz, den dein bester Kunde über dich sagen würde.</div>
-            <input
-              ref={setPrimaryRef as React.RefCallback<HTMLInputElement>}
-              type="text"
-              className={`input-text${fieldError ? ' error' : ''}`}
-              value={answers.q2}
-              onChange={e => setAnswer('q2', e.target.value)}
-              placeholder='z.B. "Er liefert schnell und denkt mit."'
-              autoFocus
-            />
-            {fieldError && <div className="field-error-msg">Bitte füll dieses Feld aus.</div>}
-            <div className="nav-row">
-              <button className="btn-secondary" onClick={() => goTo('q1')}><ArrowLeft /> Zurück</button>
-              <button className="btn-primary" onClick={() => goToIfFilled(answers.q2, 'q3')}>Weiter</button>
+              <button className="btn-primary" onClick={() => goToIfFilled(answers.q1, 'q3')}>Weiter</button>
             </div>
           </div>
         )}
@@ -302,7 +303,7 @@ export default function Quiz() {
         {/* ── Q3 ── */}
         {screen === 'q3' && (
           <div className="screen">
-            <div className="question-num">Frage 3 von 7</div>
+            <div className="question-num">Frage 2 von 6</div>
             <div className="question-title">Worin bist du besser als 90% deiner Mitbewerber?</div>
             <div className="question-sub">Dein unfairer Vorteil. Das, was dich wirklich unterscheidet.</div>
             <input
@@ -316,7 +317,7 @@ export default function Quiz() {
             />
             {fieldError && <div className="field-error-msg">Bitte füll dieses Feld aus.</div>}
             <div className="nav-row">
-              <button className="btn-secondary" onClick={() => goTo('q2')}><ArrowLeft /> Zurück</button>
+              <button className="btn-secondary" onClick={() => goTo('q1')}><ArrowLeft /> Zurück</button>
               <button className="btn-primary" onClick={() => goToIfFilled(answers.q3, 'q4')}>Weiter</button>
             </div>
           </div>
@@ -325,7 +326,7 @@ export default function Quiz() {
         {/* ── Q4 ── */}
         {screen === 'q4' && (
           <div className="screen">
-            <div className="question-num">Frage 4 von 7</div>
+            <div className="question-num">Frage 3 von 6</div>
             <div className="question-title">Wer ist dein profitabelster Kundentyp?</div>
             <div className="question-sub">Branche + Rolle. Wer zahlt am meisten und macht am wenigsten Stress?</div>
             <input
@@ -348,7 +349,7 @@ export default function Quiz() {
         {/* ── Q5 ── */}
         {screen === 'q5' && (
           <div className="screen">
-            <div className="question-num">Frage 5 von 7</div>
+            <div className="question-num">Frage 4 von 6</div>
             <div className="question-title">Welches konkrete Problem löst du für diese Kunden?</div>
             <div className="question-sub">Nicht was du tust, sondern welches Ergebnis du lieferst.</div>
             <textarea
@@ -370,7 +371,7 @@ export default function Quiz() {
         {/* ── Q6 ── */}
         {screen === 'q6' && (
           <div className="screen">
-            <div className="question-num">Frage 6 von 7</div>
+            <div className="question-num">Frage 5 von 6</div>
             <div className="question-title">Wie hoch ist dein aktueller Monatsumsatz?</div>
             <div className="question-sub">Grobe Einordnung reicht. Damit passen wir die Preisempfehlung an.</div>
             <div
@@ -381,7 +382,7 @@ export default function Quiz() {
                 <div
                   key={opt}
                   className={`range-chip${answers.q6 === opt ? ' selected' : ''}`}
-                  onClick={() => setAnswer('q6', opt)}
+                  onClick={() => { setAnswer('q6', opt); goTo('q7'); }}
                 >
                   {opt}
                 </div>
@@ -398,7 +399,7 @@ export default function Quiz() {
         {/* ── Q7 ── */}
         {screen === 'q7' && (
           <div className="screen">
-            <div className="question-num">Frage 7 von 7</div>
+            <div className="question-num">Frage 6 von 6</div>
             <div className="question-title">Hast du ein klar definiertes Angebot mit festem Preis?</div>
             <div className="question-sub">Kein Stundensatz, sondern ein Paket oder Festpreis-Angebot.</div>
             <div
@@ -407,7 +408,7 @@ export default function Quiz() {
             >
               <div
                 className={`yesno-card${answers.q7 === 'ja' ? ' selected' : ''}`}
-                onClick={() => setAnswer('q7', 'ja')}
+                onClick={() => handleShowResult('ja')}
               >
                 <div className="yesno-icon">✓</div>
                 <div className="yesno-label">Ja</div>
@@ -415,7 +416,7 @@ export default function Quiz() {
               </div>
               <div
                 className={`yesno-card${answers.q7 === 'nein' ? ' selected' : ''}`}
-                onClick={() => setAnswer('q7', 'nein')}
+                onClick={() => handleShowResult('nein')}
               >
                 <div className="yesno-icon">✗</div>
                 <div className="yesno-label">Nein</div>
@@ -425,7 +426,7 @@ export default function Quiz() {
             {fieldError && <div className="field-error-msg">Bitte wähle eine Option aus.</div>}
             <div className="nav-row">
               <button className="btn-secondary" onClick={() => goTo('q6')}><ArrowLeft /> Zurück</button>
-              <button className="btn-primary" onClick={handleShowResult}>
+              <button className="btn-primary" onClick={() => handleShowResult()}>
                 Ergebnis anzeigen
                 <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
                   <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

@@ -1,62 +1,54 @@
 /**
- * Simple in-memory rate limiter for Next.js API routes.
- * Protects costly endpoints (e.g. /api/analyze) from spam.
+ * Distributed rate limiter for /api/analyze via Upstash Redis.
  *
- * NOTE: This is process-local. In multi-replica deployments, switch to
- * a shared store (e.g. Upstash Redis via @upstash/ratelimit).
+ * Shared across all Vercel serverless instances — no per-instance in-memory
+ * state that could be bypassed by hitting different replicas.
+ *
+ * Fail-closed: if Redis is unavailable (e.g. free-tier exhausted, network
+ * issue), requests are blocked with 429 rather than let through unthrottled.
+ *
+ * Required env vars (auto-injected by Vercel after linking the Upstash store):
+ *   UPSTASH_REDIS_REST_URL
+ *   UPSTASH_REDIS_REST_TOKEN
  */
 
-interface Entry {
-  count: number;
-  resetAt: number;
-}
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
-const store = new Map<string, Entry>();
+let limiter: Ratelimit | null = null;
 
-// Periodically evict expired entries to avoid memory growth.
-setInterval(() => {
-  const now = Date.now();
-  store.forEach((entry, key) => {
-    if (now > entry.resetAt) store.delete(key);
+const redisUrl = process.env.KV_REST_API_URL;
+const redisToken = process.env.KV_REST_API_TOKEN;
+
+if (redisUrl && redisToken) {
+  limiter = new Ratelimit({
+    redis: new Redis({ url: redisUrl, token: redisToken }),
+    limiter: Ratelimit.slidingWindow(5, '60 s'),
+    prefix: 'rl:analyze',
   });
-}, 5 * 60_000);
+}
 
 export interface RateLimitResult {
   allowed: boolean;
-  remaining: number;
   retryAfterMs: number;
 }
 
-/**
- * @param identifier  Usually the client IP address.
- * @param maxRequests Maximum allowed requests per window.
- * @param windowMs    Duration of the sliding window in milliseconds.
- */
-export function checkRateLimit(
-  identifier: string,
-  maxRequests = 5,
-  windowMs = 60_000,
-): RateLimitResult {
-  const now = Date.now();
-  const entry = store.get(identifier);
-
-  if (!entry || now > entry.resetAt) {
-    store.set(identifier, { count: 1, resetAt: now + windowMs });
-    return { allowed: true, remaining: maxRequests - 1, retryAfterMs: 0 };
+export async function checkRateLimit(ip: string): Promise<RateLimitResult> {
+  if (!limiter) {
+    // Redis not configured — fail-closed.
+    console.error('[rateLimit] No Redis configured. Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.');
+    return { allowed: false, retryAfterMs: 60_000 };
   }
 
-  if (entry.count >= maxRequests) {
+  try {
+    const { success, reset } = await limiter.limit(ip);
     return {
-      allowed: false,
-      remaining: 0,
-      retryAfterMs: entry.resetAt - now,
+      allowed: success,
+      retryAfterMs: success ? 0 : Math.max(0, reset - Date.now()),
     };
+  } catch (err) {
+    // Redis unavailable — fail-closed to protect API costs.
+    console.error('[rateLimit] Redis error, blocking request:', err);
+    return { allowed: false, retryAfterMs: 60_000 };
   }
-
-  entry.count++;
-  return {
-    allowed: true,
-    remaining: maxRequests - entry.count,
-    retryAfterMs: 0,
-  };
 }
