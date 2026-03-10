@@ -64,9 +64,18 @@ export interface TrackEventPayload {
 // Lead Submission
 // ────────────────────────────────────────────────────────────
 
+export interface UtmParams {
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
+}
+
 export interface LeadPayload {
   email: string;
   phone: string;
   answers: UserAnswers;
-  eventId: string;
+  result?: AnalyzeResponse;
+  utm?: UtmParams;
 }

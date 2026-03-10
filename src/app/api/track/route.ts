@@ -22,7 +22,7 @@ function normalizePhone(phone: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  const pixelId = process.env.FB_PIXEL_ID;
+  const pixelId = process.env.FB_PIXEL_ID ?? process.env.NEXT_PUBLIC_FB_PIXEL_ID;
   const accessToken = process.env.FB_ACCESS_TOKEN;
 
   // If not configured, silently succeed (tracking is optional)

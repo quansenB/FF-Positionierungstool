@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Ungültige Anfrage.' }, { status: 400 });
   }
 
-  const { email, phone, answers, eventId } = body;
+  const { email, phone, answers, result, utm } = body;
 
   // ── Validation ──
   if (!email || !isValidEmail(email)) {
@@ -39,21 +39,34 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Ungültige Telefonnummer.' }, { status: 422 });
   }
 
+  // ── Read Facebook cookies from request ──
+  const cookieHeader = req.headers.get('cookie') ?? '';
+  const parseCookie = (name: string) =>
+    cookieHeader.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`))?.[1] ?? undefined;
+
+  const fbc = parseCookie('_fbc');
+  const fbp = parseCookie('_fbp');
+
   // ── Build webhook payload ──
   const webhookPayload = {
     email,
     phone,
-    eventId: eventId ?? '',
     submittedAt: new Date().toISOString(),
+    // Quiz answers
     answers: {
       hauptdienstleistung: answers?.q1 ?? '',
-      usp: answers?.q2 ?? '',
       differenzierung: answers?.q3 ?? '',
       zielgruppe: answers?.q4 ?? '',
       problem: answers?.q5 ?? '',
       monatsumsatz: answers?.q6 ?? '',
       hatFestesAngebot: answers?.q7 ?? '',
     },
+    // AI-generated ladder result
+    angebotsleiter: result?.steps ?? null,
+    // UTM tracking
+    utm: utm ?? {},
+    // Facebook parameters
+    facebook: { fbc, fbp },
   };
 
   // ── Forward to webhook (Make / Zapier / n8n) ──

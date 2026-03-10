@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import type { UserAnswers, AnalyzeResponse } from '@/lib/types';
+import type { UserAnswers, AnalyzeResponse, UtmParams } from '@/lib/types';
 import { trackBrowserEvent, trackEvent } from '@/lib/fbTrack';
 import Header from './Header';
 import ProgressBar from './ProgressBar';
@@ -104,17 +104,24 @@ export default function Quiz() {
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
   const [analyzeError] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
-  const [eventId, setEventId] = useState('');
   const [fieldError, setFieldError] = useState(false);
+  const [utm, setUtm] = useState<UtmParams>({});
 
   // Callback ref for the primary interactive element on each question screen
   const primaryEl = useRef<HTMLElement | null>(null);
   const setPrimaryRef = (el: HTMLElement | null) => { primaryEl.current = el; };
 
   useEffect(() => {
-    const id = `ev_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-    setEventId(id);
-    trackBrowserEvent('PageView', id);
+    trackEvent('PageView');
+
+    // Capture UTM params from URL
+    const p = new URLSearchParams(window.location.search);
+    const captured: UtmParams = {};
+    for (const key of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const) {
+      const val = p.get(key);
+      if (val) captured[key] = val;
+    }
+    setUtm(captured);
   }, []);
 
   const goTo = (s: Screen) => {
@@ -171,9 +178,7 @@ export default function Quiz() {
       const data: AnalyzeResponse = await res.json();
       setResult(data);
 
-      if (eventId) {
-        trackEvent('QuizComplete', eventId, undefined, { service: answers.q1 });
-      }
+      trackEvent('QuizComplete', undefined, { service: answers.q1 });
 
       goTo('result');
     } catch {
@@ -188,12 +193,12 @@ export default function Quiz() {
       const res = await fetch('/api/submit-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, phone, answers, eventId }),
+        body: JSON.stringify({ email, phone, answers, result, utm }),
       });
 
       if (!res.ok) return false;
 
-      if (eventId) trackEvent('Lead', eventId, { email, phone });
+      trackEvent('Lead', { email, phone });
       setIsUnlocked(true);
       return true;
     } catch {

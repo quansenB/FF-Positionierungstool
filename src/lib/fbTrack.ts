@@ -11,6 +11,10 @@ declare global {
   }
 }
 
+function generateEventId(): string {
+  return `ev_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}
+
 export function trackBrowserEvent(
   eventName: string,
   eventId: string,
@@ -37,13 +41,18 @@ export async function trackServerEvent(
   }
 }
 
-/** Sends event to BOTH browser Pixel and server CAPI. */
+/**
+ * Sends event to BOTH browser Pixel and server CAPI.
+ * Generates a unique eventId per call for correct deduplication.
+ * Returns the eventId so callers can reference it (e.g. for Lead submission).
+ */
 export function trackEvent(
   eventName: string,
-  eventId: string,
   userData?: { email?: string; phone?: string },
   customData?: Record<string, unknown>,
-): void {
+): string {
+  const eventId = generateEventId();
   trackBrowserEvent(eventName, eventId, customData);
   void trackServerEvent(eventName, eventId, userData, customData);
+  return eventId;
 }
