@@ -30,35 +30,6 @@ const DEFAULT_ANSWERS: UserAnswers = {
   q1: '', q2: '', q3: '', q4: '', q5: '', q6: '', q7: '', // q2 kept in type for API compat but not shown
 };
 
-const FALLBACK_RESULT: AnalyzeResponse = {
-  steps: [
-    {
-      title: 'Kostenloser Profil Check',
-      description: 'Ich analysiere dein LinkedIn-Profil und deine aktuelle Content-Positionierung in 15 Minuten und zeige dir die 3 größten Hebel für mehr Sichtbarkeit und qualifizierte Anfragen. Kein Pitch, nur konkretes Feedback.',
-      price: 'Kostenlos',
-      priceTag: 'Kostenlos',
-    },
-    {
-      title: 'Content-Positionierungs-Sprint',
-      description: 'In einem 90-minütigen Workshop entwickeln wir deine Nische, dein Kernthema und dein Angebotsversprechen. Du gehst mit einem fertigen Positionierungs-Statement und einer Contentplan-Vorlage raus. Geld-zurück-Garantie bei Unzufriedenheit.',
-      price: '500 – 1.500 €',
-      priceTag: '500 – 1.500 €',
-    },
-    {
-      title: 'Content-Strategie & Aufbau',
-      description: 'Wir bauen gemeinsam deine vollständige Content-Strategie: Themenarchitektur, Redaktionsplan, Distribution und Conversion-Strecke. Der Sprint-Preis wird vollständig angerechnet.',
-      price: '3.000 – 8.000 €',
-      priceTag: '3.000 – 8.000 €',
-    },
-    {
-      title: 'Content-Retainer',
-      description: 'Monatliche Zusammenarbeit mit Content-Beratung, Sparring und Umsetzungsbegleitung. Planbare Einnahmen für dich, planbare Content-Qualität für deine Kunden.',
-      price: '800 – 2.500 € / Monat',
-      priceTag: '800 – 2.500 €/Mo',
-    },
-  ],
-};
-
 // ─── Shake helper ────────────────────────────────────────────
 function shakeElement(el: HTMLElement | null) {
   if (!el) return;
@@ -102,7 +73,7 @@ export default function Quiz() {
   const [screenKey, setScreenKey] = useState(0);
   const [answers, setAnswers] = useState<UserAnswers>(DEFAULT_ANSWERS);
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
-  const [analyzeError] = useState(false);
+  const [analyzeError, setAnalyzeError] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [fieldError, setFieldError] = useState(false);
   const [utm, setUtm] = useState<UtmParams>({});
@@ -161,7 +132,9 @@ export default function Quiz() {
       return;
     }
 
+    if (q7Override) setAnswer('q7', q7Override);
     setResult(null);
+    setAnalyzeError(false);
     goTo('loading');
 
     try {
@@ -180,7 +153,7 @@ export default function Quiz() {
 
       goTo('result');
     } catch {
-      setResult(FALLBACK_RESULT);
+      setAnalyzeError(true);
       goTo('result');
     }
   };
@@ -355,12 +328,13 @@ export default function Quiz() {
             <div className="question-num">Frage 4 von 6</div>
             <div className="question-title">Welches konkrete Problem löst du für diese Kunden?</div>
             <div className="question-sub">Nicht was du tust, sondern welches Ergebnis du lieferst.</div>
-            <textarea
-              ref={setPrimaryRef as React.RefCallback<HTMLTextAreaElement>}
+            <input
+              ref={setPrimaryRef as React.RefCallback<HTMLInputElement>}
+              type="text"
               className={`input-text${fieldError ? ' error' : ''}`}
               value={answers.q5}
               onChange={e => setAnswer('q5', e.target.value)}
-              placeholder='z.B. "Meine Kunden haben zu wenig qualifizierte Leads und verlieren Umsatz an Wettbewerber mit besserer Online-Präsenz."'
+              placeholder='z.B. "Meine Kunden haben zu wenig qualifizierte Leads..."'
               autoFocus
             />
             {fieldError && <div className="field-error-msg">Bitte füll dieses Feld aus.</div>}
@@ -471,7 +445,7 @@ export default function Quiz() {
             answers={answers}
             result={result}
             isAnalyzing={false}
-            analyzeError={false}
+            analyzeError={analyzeError}
             isUnlocked={isUnlocked}
             onUnlock={handleUnlock}
             onRetry={handleShowResult}

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import Script from 'next/script';
-import type { AnalyzeResponse, UserAnswers } from '@/lib/types';
-import StageCard from './StageCard';
+import { useState, useRef } from "react";
+import Script from "next/script";
+import type { AnalyzeResponse, UserAnswers } from "@/lib/types";
+import StageCard from "./StageCard";
 
 interface Props {
   answers: UserAnswers;
@@ -16,17 +16,17 @@ interface Props {
 }
 
 const STAGE_DESCRIPTIONS = [
-  'Dein Einstieg in die Kundenbeziehung. Du gibst kostenlos echten Mehrwert, z.B. durch einen kurzen Audit, eine Analyse oder eine Consultation. Das Ziel: Vertrauen aufbauen und zeigen, dass du weißt, wovon du redest.',
-  'Der erste bezahlte Auftrag. Klein genug, dass es ein No-Brainer ist. Absicherung: Geld-zurück-Garantie bei Unzufriedenheit. Das eliminiert das letzte Zögern.',
-  'Dein Signature-Angebot mit dem größten Umsatzhebel. Der Kunde kennt dich bereits und vertraut dir. Ein Teil des Fuß-in-die-Tür-Angebots wird verrechnet, was den Umstieg erleichtert.',
-  'Planbarer, wiederkehrender Umsatz. Monatliche Zusammenarbeit auf Basis des Hauptangebots. Absicherung: z.B. 6 Monate Bindung mit einem Monat gratis, Abbruch im ersten Monat möglich.',
+  "Dein Einstieg in die Kundenbeziehung. Du gibst kostenlos echten Mehrwert, z.B. durch einen kurzen Audit, eine Analyse oder eine Consultation. Das Ziel: Vertrauen aufbauen und zeigen, dass du weißt, wovon du redest.",
+  "Der erste bezahlte Auftrag. Klein genug, dass es ein No-Brainer ist. Absicherung: Geld-zurück-Garantie bei Unzufriedenheit. Das eliminiert das letzte Zögern.",
+  "Dein Signature-Angebot mit dem größten Umsatzhebel. Der Kunde kennt dich bereits und vertraut dir. Ein Teil des Fuß-in-die-Tür-Angebots wird verrechnet, was den Umstieg erleichtert.",
+  "Planbarer, wiederkehrender Umsatz. Monatliche Zusammenarbeit auf Basis des Hauptangebots. Absicherung: z.B. 6 Monate Bindung mit einem Monat gratis, Abbruch im ersten Monat möglich.",
 ];
 
 const STAGE_TITLES = [
-  'Kostenloser Value',
-  'Fuß-in-die-Tür-Angebot',
-  'Hauptangebot',
-  'Retainer',
+  "Kostenloser Value",
+  "Fuß-in-die-Tür-Angebot",
+  "Hauptangebot",
+  "Retainer",
 ];
 
 export default function ResultScreen({
@@ -38,24 +38,23 @@ export default function ResultScreen({
   onUnlock,
   onRetry,
 }: Props) {
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [phoneError, setPhoneError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
 
-
   // Price tags shown in accordion headers (generic fallback before AI result)
   const priceTags = result
-    ? result.steps.map(s => s.priceTag)
-    : ['Kostenlos', '2.000 – 5.000 €', '5.000 – 30.000 €', '100 – 10.000 €/Mo'];
+    ? result.steps.map((s) => s.priceTag)
+    : ["Kostenlos", "2.000 – 5.000 €", "5.000 – 30.000 €", "100 – 10.000 €/Mo"];
 
   const handleUnlock = async () => {
     let hasError = false;
 
-    if (!email || !email.includes('@')) {
+    if (!email || !email.includes("@")) {
       setEmailError(true);
       triggerShake(emailRef.current);
       hasError = true;
@@ -63,7 +62,7 @@ export default function ResultScreen({
       setEmailError(false);
     }
 
-    if (!phone || phone.trim() === '') {
+    if (!phone || phone.trim() === "") {
       setPhoneError(true);
       triggerShake(phoneRef.current);
       hasError = true;
@@ -79,7 +78,7 @@ export default function ResultScreen({
 
     if (!ok) {
       // Surface a gentle error without breaking the form
-      alert('Es gab einen Fehler beim Freischalten. Bitte versuche es erneut.');
+      alert("Es gab einen Fehler beim Freischalten. Bitte versuche es erneut.");
     }
   };
 
@@ -88,23 +87,21 @@ export default function ResultScreen({
       {/* ── Header ─────────────────────────────────────── */}
       <div className="result-header">
         <h2>Deine Positionierungsleiter</h2>
-        <p>
-          So könnte eine durchdachte Angebotsstruktur für dich aussehen.
-        </p>
+        <p>So könnte eine durchdachte Angebotsstruktur für dich aussehen.</p>
       </div>
 
       {/* ── Concept explanation ─────────────────────────── */}
       <div className="concept-box">
         <h3>Was ist eine Angebotsleiter?</h3>
         <p>
-          Die meisten Freelancer verkaufen ein einziges Angebot und hoffen,
-          dass der Kunde sofort Ja sagt. Das Problem: Der Kunde kennt dich
-          nicht, vertraut dir nicht und hat keine Ahnung, ob du liefern kannst.
+          Die meisten Freelancer verkaufen ein einziges Angebot und hoffen, dass
+          der Kunde sofort Ja sagt. Das Problem: Der Kunde kennt dich nicht,
+          vertraut dir nicht und hat keine Ahnung, ob du liefern kannst.
         </p>
         <p>
-          Die Angebotsleiter löst das. Du baust 4 Stufen auf, die das
-          Commitment des Kunden schrittweise erhöhen. Vom kostenlosen Einstieg
-          bis zur langfristigen Zusammenarbeit.
+          Die Angebotsleiter löst das. Du baust 4 Stufen auf, die das Commitment
+          des Kunden schrittweise erhöhen. Vom kostenlosen Einstieg bis zur
+          langfristigen Zusammenarbeit.
         </p>
 
         <div className="commitment-bar">
@@ -152,9 +149,9 @@ export default function ResultScreen({
       {analyzeError && !isAnalyzing && (
         <div className="error-state">
           <p>Die Analyse konnte nicht abgeschlossen werden.</p>
-          <button className="btn-primary" onClick={onRetry}>
+          <a className="btn-primary" href="/">
             Erneut versuchen
-          </button>
+          </a>
         </div>
       )}
 
@@ -203,15 +200,33 @@ export default function ResultScreen({
                 <div className="paywall-overlay">
                   <div className="optin-box">
                     <div className="optin-lock">
-                      <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-                        <rect x="3" y="11" width="18" height="11" rx="2" stroke="#e55d3c" strokeWidth="2" />
-                        <path d="M7 11V7a5 5 0 0110 0v4" stroke="#e55d3c" strokeWidth="2" strokeLinecap="round" />
+                      <svg
+                        width="22"
+                        height="22"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <rect
+                          x="3"
+                          y="11"
+                          width="18"
+                          height="11"
+                          rx="2"
+                          stroke="#e55d3c"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M7 11V7a5 5 0 0110 0v4"
+                          stroke="#e55d3c"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
                       </svg>
                     </div>
                     <h3>Deine komplette Leiter freischalten</h3>
                     <p>
-                      Erhalte alle 4 Stufen mit konkreten Angebotsvorschlägen und
-                      Preisempfehlungen, individuell für dich.
+                      Erhalte alle 4 Stufen mit konkreten Angebotsvorschlägen
+                      und Preisempfehlungen, individuell für dich.
                     </p>
                     <div className="optin-form">
                       <input
@@ -219,25 +234,29 @@ export default function ResultScreen({
                         type="email"
                         placeholder="Deine E-Mail-Adresse"
                         value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && handleUnlock()}
-                        style={emailError ? { borderColor: '#e55d3c' } : undefined}
+                        onChange={(e) => setEmail(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleUnlock()}
+                        style={
+                          emailError ? { borderColor: "#e55d3c" } : undefined
+                        }
                       />
                       <input
                         ref={phoneRef}
                         type="tel"
                         placeholder="Deine Telefonnummer"
                         value={phone}
-                        onChange={e => setPhone(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && handleUnlock()}
-                        style={phoneError ? { borderColor: '#e55d3c' } : undefined}
+                        onChange={(e) => setPhone(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleUnlock()}
+                        style={
+                          phoneError ? { borderColor: "#e55d3c" } : undefined
+                        }
                       />
                       <button
                         className="btn-primary"
                         onClick={handleUnlock}
                         disabled={isSubmitting}
                       >
-                        {isSubmitting ? 'Einen Moment …' : 'Freischalten'}
+                        {isSubmitting ? "Einen Moment …" : "Freischalten"}
                       </button>
                     </div>
                     {/* <div className="optin-trust">
@@ -257,8 +276,19 @@ export default function ResultScreen({
             <div className="result-unlocked">
               <div className="unlocked-msg">
                 <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  <path d="M22 4L12 14.01l-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M22 11.08V12a10 10 0 11-5.93-9.14"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M22 4L12 14.01l-3-3"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
                 Alle Stufen freigeschaltet
               </div>
@@ -278,7 +308,7 @@ export default function ResultScreen({
               <div
                 className="calendly-inline-widget calendly-wrap"
                 data-url="https://calendly.com/finally-freelancing-analysegespraech/erstgespraech?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=ffffff"
-                style={{ minWidth: '320px', height: '700px' }}
+                style={{ minWidth: "320px", height: "700px" }}
               />
               <Script
                 src="https://assets.calendly.com/assets/external/widget.js"
@@ -303,8 +333,15 @@ interface LadderStepProps {
   locked?: boolean;
 }
 
-function LadderStep({ label, title, description, price, visible, locked }: LadderStepProps) {
-  const cls = `ladder-step${visible ? ' visible' : ''}${locked ? ' locked' : ''}`;
+function LadderStep({
+  label,
+  title,
+  description,
+  price,
+  visible,
+  locked,
+}: LadderStepProps) {
+  const cls = `ladder-step${visible ? " visible" : ""}${locked ? " locked" : ""}`;
   return (
     <div className={cls}>
       <div className="ladder-dot-wrap">
@@ -326,6 +363,8 @@ function LadderStep({ label, title, description, price, visible, locked }: Ladde
 
 function triggerShake(el: HTMLElement | null) {
   if (!el) return;
-  el.style.animation = 'shake 0.4s ease';
-  setTimeout(() => { el.style.animation = ''; }, 400);
+  el.style.animation = "shake 0.4s ease";
+  setTimeout(() => {
+    el.style.animation = "";
+  }, 400);
 }

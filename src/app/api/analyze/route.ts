@@ -9,8 +9,6 @@ const OPENROUTER_MODELS = [
   'anthropic/claude-opus-4.6',
   'anthropic/claude-sonnet-4.6',
   'google/gemini-3.1-pro-preview',
-  'google/gemini-3-flash-preview',
-  'openai/gpt-5.4',
 ];
 
 // ─── Pricing tiers (mirrors original JS logic, now server-side) ──────────────
@@ -49,7 +47,7 @@ function getPriceTier(revenue: string): PriceTier {
 function validateAnswers(body: unknown): body is UserAnswers {
   if (!body || typeof body !== 'object') return false;
   const b = body as Record<string, unknown>;
-  const fields = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7'];
+  const fields = ['q1', 'q3', 'q4', 'q5', 'q6', 'q7'];
   for (const f of fields) {
     if (typeof b[f] !== 'string') return false;
     if ((b[f] as string).length > 1000) return false; // hard cap per field
@@ -98,6 +96,7 @@ export async function POST(req: NextRequest) {
   const prompt = `Du bist ein Experte für Freelancer-Positionierung und Angebotsstrategien.
 
 Erstelle basierend auf den Angaben unten eine **personalisierte Angebotsleiter** mit 4 Stufen für diesen Freelancer.
+Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber versuche nicht zu raten oder Dinge zu erfinden, die nicht in den Antworten stehen.
 
 **Angaben:**
 - Hauptdienstleistung: ${answers.q1}
@@ -527,10 +526,12 @@ Erstelle basierend auf den Angaben unten eine **personalisierte Angebotsleiter**
       });
 
       if (!response.ok) {
-        throw new Error(`OpenRouter API error: ${response.status}`);
+        const errBody = await response.text();
+        throw new Error(`OpenRouter ${response.status}: ${errBody}`);
       }
 
       const data = await response.json() as { choices: { message: { content: string } }[] };
+      console.log(`[/api/analyze] Attempt ${attempt} raw response:`, JSON.stringify(data).slice(0, 500));
       const rawContent = data.choices?.[0]?.message?.content;
       if (!rawContent) {
         throw new Error('Empty response from OpenRouter');
