@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Script from "next/script";
-import type { AnalyzeResponse, UserAnswers } from "@/lib/types";
+import type { AnalyzeResponse, UserAnswers, UtmParams } from "@/lib/types";
 import StageCard from "./StageCard";
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
   isAnalyzing: boolean;
   analyzeError: boolean;
   isUnlocked: boolean;
+  utm?: UtmParams;
   onUnlock: (email: string, phone: string) => Promise<boolean>;
   onRetry: () => void;
 }
@@ -35,9 +36,20 @@ export default function ResultScreen({
   isAnalyzing,
   analyzeError,
   isUnlocked,
+  utm,
   onUnlock,
   onRetry,
 }: Props) {
+  const calendlyUrl = (() => {
+    const base = new URL("https://calendly.com/finally-freelancing-analysegespraech/ki-postionierung-erstgespraech");
+    base.searchParams.set("hide_landing_page_details", "1");
+    base.searchParams.set("hide_gdpr_banner", "1");
+    base.searchParams.set("background_color", "ffffff");
+    if (utm) {
+      Object.entries(utm).forEach(([k, v]) => { if (v) base.searchParams.set(k, v); });
+    }
+    return base.toString();
+  })();
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [emailError, setEmailError] = useState(false);
@@ -271,43 +283,22 @@ export default function ResultScreen({
             </div>
           </div>
 
-          {/* ── Unlocked confirmation ─────────────────────── */}
-          {isUnlocked && (
-            <div className="result-unlocked">
-              <div className="unlocked-msg">
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                  <path
-                    d="M22 11.08V12a10 10 0 11-5.93-9.14"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M22 4L12 14.01l-3-3"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                Alle Stufen freigeschaltet
-              </div>
-            </div>
-          )}
-
           {/* ── CTA ──────────────────────────────────────── */}
           {isUnlocked && (
             <div className="result-cta">
-              <h4>Das war erst der Anfang.</h4>
+              <h4>Wie es für dich jetzt weitergeht</h4>
               <p>
-                Das ist natürlich eine automatisierte Auswertung. In einem
-                persönlichen Gespräch gehen wir noch mal tiefer rein – checken
-                alles gegen und schleifen deine Angebotsleiter auf deine
-                individuelle Situation fein.
+                Der Postionierungs-Check ist eine KI-basierte, automatisierte
+                Auswertung. In einem persönlichen Gespräch können wir nochmal
+                tiefer auf deine individuelle Situation eingehen, Fragen klären
+                und konkrete nächste Schritte besprechen. Buche dir hier direkt
+                einen Termin für ein kostenloses Analysegespräch, in dem wir
+                deine Positionierung den letzten Schliff geben und deine
+                Angebotsleiter optimieren.
               </p>
               <div
                 className="calendly-inline-widget calendly-wrap"
-                data-url="https://calendly.com/finally-freelancing-analysegespraech/erstgespraech?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=ffffff"
+                data-url={calendlyUrl}
                 style={{ minWidth: "320px", height: "700px" }}
               />
               <Script

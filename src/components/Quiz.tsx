@@ -447,6 +447,7 @@ export default function Quiz() {
             isAnalyzing={false}
             analyzeError={analyzeError}
             isUnlocked={isUnlocked}
+            utm={utm}
             onUnlock={handleUnlock}
             onRetry={handleShowResult}
           />
