@@ -11,6 +11,8 @@
   "dependencies": {
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.36.4",
+    "@vercel/analytics": "^2.0.0",
+    "@vercel/speed-insights": "^2.0.0",
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
