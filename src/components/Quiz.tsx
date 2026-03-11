@@ -223,7 +223,7 @@ export default function Quiz() {
               </div>
               <h1>Finde deine <em>Positionierung</em> als Freelancer</h1>
               <p>
-                7 Fragen. Dein individueller Entwurf für eine Angebotsleiter,
+                6 Fragen. Dein individueller Entwurf für eine Angebotsleiter,
                 mit der du planbarer verkaufst und höhere Preise durchsetzt.
               </p>
               <div className="intro-features">
