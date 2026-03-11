@@ -256,7 +256,6 @@ export default function Quiz() {
         {/* ── Q1 ── */}
         {screen === 'q1' && (
           <div className="screen">
-            <div className="question-num">Frage 1 von 7</div>
             <div className="question-title">Was ist deine Hauptdienstleistung?</div>
             <div className="question-sub">Die eine Sache, mit der du den Großteil deines Umsatzes machst.</div>
             <input
@@ -279,7 +278,6 @@ export default function Quiz() {
         {/* ── Q3 ── */}
         {screen === 'q3' && (
           <div className="screen">
-            <div className="question-num">Frage 2 von 6</div>
             <div className="question-title">Worin bist du besser als 90% deiner Mitbewerber?</div>
             <div className="question-sub">Dein unfairer Vorteil. Das, was dich wirklich unterscheidet.</div>
             <input
@@ -302,7 +300,6 @@ export default function Quiz() {
         {/* ── Q4 ── */}
         {screen === 'q4' && (
           <div className="screen">
-            <div className="question-num">Frage 3 von 6</div>
             <div className="question-title">Wer ist dein profitabelster Kundentyp?</div>
             <div className="question-sub">Branche + Rolle. Wer zahlt am meisten und macht am wenigsten Stress?</div>
             <input
@@ -325,7 +322,6 @@ export default function Quiz() {
         {/* ── Q5 ── */}
         {screen === 'q5' && (
           <div className="screen">
-            <div className="question-num">Frage 4 von 6</div>
             <div className="question-title">Welches konkrete Problem löst du für diese Kunden?</div>
             <div className="question-sub">Nicht was du tust, sondern welches Ergebnis du lieferst.</div>
             <input
@@ -348,7 +344,6 @@ export default function Quiz() {
         {/* ── Q6 ── */}
         {screen === 'q6' && (
           <div className="screen">
-            <div className="question-num">Frage 5 von 6</div>
             <div className="question-title">Wie hoch ist dein aktueller Monatsumsatz?</div>
             <div className="question-sub">Grobe Einordnung reicht. Damit passen wir die Preisempfehlung an.</div>
             <div
@@ -376,7 +371,6 @@ export default function Quiz() {
         {/* ── Q7 ── */}
         {screen === 'q7' && (
           <div className="screen">
-            <div className="question-num">Frage 6 von 6</div>
             <div className="question-title">Hast du ein klar definiertes Angebot mit festem Preis?</div>
             <div className="question-sub">Kein Stundensatz, sondern ein Paket oder Festpreis-Angebot.</div>
             <div
