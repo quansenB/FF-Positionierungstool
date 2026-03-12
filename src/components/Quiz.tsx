@@ -149,7 +149,9 @@ export default function Quiz() {
       const data: AnalyzeResponse = await res.json();
       setResult(data);
 
-      trackEvent('QuizFinished', undefined, { service: answers.q1 });
+      if (!data.isSpam && data.isQualified !== false) {
+        trackEvent('QuizFinished', undefined, { service: answers.q1 });
+      }
 
       goTo('result');
     } catch {
@@ -169,7 +171,7 @@ export default function Quiz() {
 
       if (!res.ok) return false;
 
-      if (answers.q6 !== 'Unter 3.000 €') {
+      if (!result?.isSpam && result?.isQualified !== false && answers.q6 !== 'Unter 3.000 €') {
         trackEvent('Lead', { email, phone });
       }
       setIsUnlocked(true);
@@ -221,7 +223,7 @@ export default function Quiz() {
             <div className="intro">
               <div className="intro-badge">
                 <BoltIcon />
-                Kostenlos · 2 Minuten
+                Kostenfrei · 2 Minuten
               </div>
               <h1>Finde deine <em>Positionierung</em> als Freelancer</h1>
               <p>

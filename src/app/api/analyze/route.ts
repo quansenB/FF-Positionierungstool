@@ -93,9 +93,35 @@ export async function POST(req: NextRequest) {
   const prices = getPriceTier(answers.q6);
 
   // ── Claude prompt ──
-  const prompt = `Du bist ein Experte für Freelancer-Positionierung und Angebotsstrategien.
+  const prompt = `Du bist ein Experte für die Positionierung von Selbstständigen und Agenturinhabern und Angebotsstrategien.
 
-Erstelle basierend auf den Angaben unten eine **personalisierte Angebotsleiter** mit 4 Stufen für diesen Freelancer.
+**Schritt 1 – Spam-Erkennung:**
+Bevor du die Angebotsleiter erstellst, prüfe ob die Eingaben ernsthaft sind oder ob es sich um Spam, Bot-Anfragen oder offensichtliche Test-Eingaben handelt.
+Setze "isSpam": true wenn:
+- Q1 (Hauptdienstleistung) bedeutungslos ist (z.B. "test", "asdf", "123", "aaa", zufällige Zeichen, nur Leerzeichen)
+- Die meisten Felder offensichtlich zufällig oder sinnlos ausgefüllt sind
+
+Setze "isSpam": false bei echten Eingaben – auch wenn sie kurz oder unvollständig sind.
+Auch bei "isSpam": true erzeugst du trotzdem eine vollständige Angebotsleiter (mach das Beste draus).
+
+Prüfe außerdem ob der Nutzer in einem der folgenden Bereiche tätig ist:
+- Marketing (z.B. Social Media, Content, SEO, SEA, E-Mail, Performance, Copywriting, PR)
+- Kreativdienstleistungen (z.B. Design, Branding, Video, Foto, Illustration, UX/UI, Web-/Grafikdesign)
+- Development / IT (z.B. Webentwicklung, App-Entwicklung, Software, Automatisierung, KI, IT-Beratung)
+
+Setze "isQualified": true wenn die Hauptdienstleistung eindeutig in einen dieser Bereiche fällt.
+Setze "isQualified": false wenn es sich klar um einen anderen Bereich handelt (z.B. Handwerk, Gastronomie, Coaching, Finanzberatung, Immobilien, Logistik etc.).
+Im Zweifelsfall setze "isQualified": true.
+Auch bei "isQualified": false erzeugst du trotzdem eine vollständige Angebotsleiter.
+Wenn der Nutzer "Unter 3.000 €" Umsatz angibt, setze isQualified immer auf false.
+
+**Stil & Sprache (gilt für Schritt 2, für alle titles und descriptions):**
+- Keine Em-Dashes. Verwende stattdessen andere Satzzeichen: Punkte, Kommas, Doppelpunkte.
+- Keine Buzzwords oder Marketing-Floskeln (z.B. "ganzheitlich", "nachhaltig", "360°", "Transformation", "Game-Changer", "next level", "Synergien", "skalierbar"). Schreibe so, wie ein erfahrener Freelancer mit einem Kunden am Tisch reden würde: klar, konkret, ohne Aufblasen.
+- Jede Description muss ein greifbares Ergebnis benennen, nicht nur einen Prozess versprechen.
+
+**Schritt 2 – Angebotsleiter erstellen:**
+Erstelle basierend auf den Angaben unten eine **personalisierte Angebotsleiter** mit 4 Stufen für diesen Freelancer. Passe die Preise an, je nachdem welches Preislevel (q6) der Nutzer ausgewählt hat (siehe Preisrahmen weiter unten). Der Preis muss für die vorgeschlagene Dienstleistung und Umsatzniveau sinnvoll sein, aber Premium-Positioniert sein. Der Nutzer soll das Gefühl bekommen, das die Angebotsleiter für ihn ein guter finanzieller Entwicklungsschritt ist, aber nicht unrealistisch wirken.
 Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber versuche nicht zu raten oder Dinge zu erfinden, die nicht in den Antworten stehen.
 
 **Angaben:**
@@ -106,7 +132,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
 - Aktueller Monatsumsatz: ${answers.q6 || '(keine Angabe)'}
 - Hat festes Angebot/Paket: ${answers.q7 === 'ja' ? 'Ja' : answers.q7 === 'nein' ? 'Nein' : '(keine Angabe)'}
 
-**Preisrahmen (vorgegeben, NICHT ändern):**
+**Preisrahmen:**
+- Stufe 1 (Einstieg): Preis = "Kostenfrei", Tag = "Kostenfrei"
 - Stufe 2 (Fuß-in-die-Tür): Preis = "${prices.fidt}", Tag = "${prices.fidtTag}"
 - Stufe 3 (Hauptangebot): Preis = "${prices.main}", Tag = "${prices.mainTag}"
 - Stufe 4 (Retainer): Preis = "${prices.ret}", Tag = "${prices.retTag}"
@@ -114,12 +141,14 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
 **Aufgabe:** Gib NUR den folgenden JSON zurück, KEIN weiterer Text:
 
 {
+  "isSpam": false oder true, // je nachdem ob die Eingaben offensichtlich Spam sind
+  "isQualified": true oder false, // je nachdem ob die Dienstleistung in Marketing, Kreativ oder Dev/IT fällt und der Nutzer nicht "Unter 3.000 €" Umsatz angibt.
   "steps": [
     {
-      "title": "<einprägsamer Name für das kostenlose Einstiegsangebot, z.B. 'Webdesign-Quick-Check'>",
+      "title": "<einprägsamer Name für das Kostenfreie Einstiegsangebot, z.B. 'Webdesign-Quick-Check'>",
       "description": "<2–3 Sätze: Was genau bekommt der Kunde? Warum ist das wertvoll? Direkt auf Hauptdienstleistung + Zielgruppe zugeschnitten.>",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "<einprägsamer Name für das erste bezahlte Paket>",
@@ -151,8 +180,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
     {
       "title": "Landingpage-Schnellcheck",
       "description": "Ich schaue mir deine wichtigste Landingpage an und identifiziere die 3 gravierendsten Conversion-Killer. Du bekommst konkrete Handlungsanweisungen, die du sofort umsetzen kannst.",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "Umsatzleck-Analyse",
@@ -181,8 +210,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
     {
       "title": "Brand-Schnelldiagnose",
       "description": "Ich reviewe deine aktuelle CI und gebe dir 3 Quick Tipps, die du noch heute umsetzen kannst, um professioneller aufzutreten.",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "Brandingkonzept & Logo",
@@ -211,8 +240,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
     {
       "title": "Shop-Killer-Audit",
       "description": "Im Live-Call identifiziere ich die 3 größten Umsatzkiller in deinem Shop. Du weißt danach genau, was dich Geld kostet und in welcher Reihenfolge du es fixen solltest.",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "Killer-Fix Sprint",
@@ -241,8 +270,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
     {
       "title": "Ad-Account-Check",
       "description": "Ich schaue in deinen bestehenden Ad Account und sage dir direkt, welche Kampagnen Geld verbrennen und was du sofort ändern solltest.",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "Kampagnen-Overhaul",
@@ -271,8 +300,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
     {
       "title": "SEO-Potenzialanalyse",
       "description": "Ich zeige dir, welches organische Traffic-Potenzial in den nächsten 6 Monaten realistisch erreichbar ist und wo die größten Hebel liegen.",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "Low-Hanging-Fruits Sprint",
@@ -301,8 +330,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
     {
       "title": "Hero-Section-Konzept",
       "description": "Ich entwerfe ein Konzept für deine Hero Section, den wichtigsten Bereich deiner Website. Du siehst sofort, wie dein erster Eindruck auf Besucher wirken könnte.",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "Quick-Win-Optimierung",
@@ -331,8 +360,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
     {
       "title": "Architektur-Sparring",
       "description": "Wir besprechen deine aktuelle Dev-Architektur und ich zeige dir, wo die größten technischen Schulden und Optimierungspotenziale liegen.",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "Architekturplan",
@@ -361,8 +390,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
     {
       "title": "LinkedIn-Profil-Check",
       "description": "Ich analysiere dein LinkedIn-Profil und zeige dir, was du sofort ändern solltest, um mehr Sichtbarkeit bei deiner Zielgruppe zu bekommen.",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "Content-Starter-Paket",
@@ -391,8 +420,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
     {
       "title": "TikTok-Score",
       "description": "Ich berechne deinen TikTok-Score und zeige dir, ob und wie TikTok für dein Unternehmen als Recruiting- oder Marketing-Kanal funktionieren kann.",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "TikTok-Workshop",
@@ -421,8 +450,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
     {
       "title": "Webflow-Bugfix-Check",
       "description": "Ich schaue mir dein Webflow-Projekt an, finde Bugs und gebe dir eine ehrliche Einschätzung, wo es klemmt und was Priorität hat.",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "Landingpage-Build",
@@ -451,8 +480,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
     {
       "title": "Workflow-Benchmark",
       "description": "Ich zeige dir Best Practices aus vergleichbaren Branchen und wo dein aktueller Workflow im Vergleich steht. Konkrete Impulse, kein Berater-Blabla.",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "Workflow-Challenge-Workshop",
@@ -481,8 +510,8 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
     {
       "title": "Content-Recycling-Check",
       "description": "Ich analysiere dein bestehendes Videomaterial und zeige dir, welche Clips sich in virale Short-Videos verwandeln lassen, ohne einen einzigen neuen Dreh.",
-      "price": "Kostenlos",
-      "priceTag": "Kostenlos"
+      "price": "Kostenfrei",
+      "priceTag": "Kostenfrei"
     },
     {
       "title": "Shorts-Starter",
@@ -552,6 +581,12 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
       ) {
         throw new Error('Unexpected response shape from OpenRouter');
       }
+
+      // Normalise booleans (model may omit them)
+      if (typeof result.isSpam !== 'boolean') result.isSpam = false;
+      if (typeof result.isQualified !== 'boolean') result.isQualified = true;
+
+      console.log('[/api/analyze] Result:', JSON.stringify({ isSpam: result.isSpam, isQualified: result.isQualified, steps: result.steps.map(s => ({ title: s.title, price: s.price })) }, null, 2));
 
       return NextResponse.json(result);
     } catch (err) {

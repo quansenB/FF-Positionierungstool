@@ -28,7 +28,7 @@ export interface LadderStep {
   title: string;
   /** 2–3 sentence personalised description */
   description: string;
-  /** Price shown on the ladder badge, e.g. "1.500 – 2.500 €" or "Kostenlos" */
+  /** Price shown on the ladder badge, e.g. "1.500 – 2.500 €" or "Kostenfrei" */
   price: string;
   /** Price shown in the accordion header tag, e.g. "2.000 – 5.000 €" */
   priceTag: string;
@@ -37,13 +37,16 @@ export interface LadderStep {
 /**
  * Expected response shape from Claude via /api/analyze.
  *
- * steps[0] = Kostenloser Einstieg  (always shown)
+ * steps[0] = Kostenfreier Einstieg  (always shown)
  * steps[1] = Fuß-in-die-Tür        (locked until opt-in)
  * steps[2] = Hauptangebot           (locked until opt-in)
  * steps[3] = Retainer               (locked until opt-in)
+ * isSpam   = true if input looks like spam/test — suppresses Meta events
  */
 export interface AnalyzeResponse {
   steps: [LadderStep, LadderStep, LadderStep, LadderStep];
+  isSpam?: boolean;
+  isQualified?: boolean;
 }
 
 // ────────────────────────────────────────────────────────────

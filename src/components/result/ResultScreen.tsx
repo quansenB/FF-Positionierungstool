@@ -17,14 +17,14 @@ interface Props {
 }
 
 const STAGE_DESCRIPTIONS = [
-  "Dein Einstieg in die Kundenbeziehung. Du gibst kostenlos echten Mehrwert, z.B. durch einen kurzen Audit, eine Analyse oder eine Consultation. Das Ziel: Vertrauen aufbauen und zeigen, dass du weißt, wovon du redest.",
+  "Dein Einstieg in die Kundenbeziehung. Du gibst Kostenfrei echten Mehrwert, z.B. durch einen kurzen Audit, eine Analyse oder eine Consultation. Das Ziel: Vertrauen aufbauen und zeigen, dass du weißt, wovon du redest.",
   "Der erste bezahlte Auftrag. Klein genug, dass es ein No-Brainer ist. Absicherung: Geld-zurück-Garantie bei Unzufriedenheit. Das eliminiert das letzte Zögern.",
   "Dein Signature-Angebot mit dem größten Umsatzhebel. Der Kunde kennt dich bereits und vertraut dir. Ein Teil des Fuß-in-die-Tür-Angebots wird verrechnet, was den Umstieg erleichtert.",
   "Planbarer, wiederkehrender Umsatz. Monatliche Zusammenarbeit auf Basis des Hauptangebots. Absicherung: z.B. 6 Monate Bindung mit einem Monat gratis, Abbruch im ersten Monat möglich.",
 ];
 
 const STAGE_TITLES = [
-  "Kostenloser Value",
+  "Kostenfreier Value",
   "Fuß-in-die-Tür-Angebot",
   "Hauptangebot",
   "Retainer",
@@ -61,7 +61,7 @@ export default function ResultScreen({
   // Price tags shown in accordion headers (generic fallback before AI result)
   const priceTags = result
     ? result.steps.map((s) => s.priceTag)
-    : ["Kostenlos", "2.000 – 5.000 €", "5.000 – 30.000 €", "100 – 10.000 €/Mo"];
+    : ["Kostenfrei", "2.000 – 5.000 €", "5.000 – 30.000 €", "100 – 10.000 €/Mo"];
 
   const handleUnlock = async () => {
     let hasError = false;
@@ -112,12 +112,12 @@ export default function ResultScreen({
         </p>
         <p>
           Die Angebotsleiter löst das. Du baust 4 Stufen auf, die das Commitment
-          des Kunden schrittweise erhöhen. Vom kostenlosen Einstieg bis zur
+          des Kunden schrittweise erhöhen. Vom Kostenfreien Einstieg bis zur
           langfristigen Zusammenarbeit.
         </p>
 
         <div className="commitment-bar">
-          <div className="commitment-seg">Kostenlos</div>
+          <div className="commitment-seg">Kostenfrei</div>
           <div className="commitment-seg">Fuß in die Tür</div>
           <div className="commitment-seg">Hauptangebot</div>
           <div className="commitment-seg">Retainer</div>
@@ -174,7 +174,7 @@ export default function ResultScreen({
 
             {/* Step 1 – always visible */}
             <LadderStep
-              label="Stufe 1 · Kostenloser Einstieg"
+              label="Stufe 1 · Kostenfreier Einstieg"
               title={result.steps[0].title}
               description={result.steps[0].description}
               price={result.steps[0].price}
@@ -292,7 +292,7 @@ export default function ResultScreen({
                 Auswertung. In einem persönlichen Gespräch können wir nochmal
                 tiefer auf deine individuelle Situation eingehen, Fragen klären
                 und konkrete nächste Schritte besprechen. Buche dir hier direkt
-                einen Termin für ein kostenloses Analysegespräch, in dem wir
+                einen Termin für ein Kostenfreies Analysegespräch, in dem wir
                 deine Positionierung den letzten Schliff geben und deine
                 Angebotsleiter optimieren.
               </p>
