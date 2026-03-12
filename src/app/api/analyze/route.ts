@@ -121,7 +121,8 @@ Wenn der Nutzer "Unter 3.000 €" Umsatz angibt, setze isQualified immer auf fal
 - Jede Description muss ein greifbares Ergebnis benennen, nicht nur einen Prozess versprechen.
 
 **Schritt 2 – Angebotsleiter erstellen:**
-Erstelle basierend auf den Angaben unten eine **personalisierte Angebotsleiter** mit 4 Stufen für diesen Freelancer. Passe die Preise an, je nachdem welches Preislevel (q6) der Nutzer ausgewählt hat (siehe Preisrahmen weiter unten). Der Preis muss für die vorgeschlagene Dienstleistung und Umsatzniveau sinnvoll sein, aber Premium-Positioniert sein. Der Nutzer soll das Gefühl bekommen, das die Angebotsleiter für ihn ein guter finanzieller Entwicklungsschritt ist, aber nicht unrealistisch wirken.
+Erstelle basierend auf den Angaben unten eine **personalisierte Angebotsleiter** mit 4 Stufen für diesen Selbstständigen oder Agenturinhaber. Passe die Preise an, je nachdem welches Preislevel (q6) der Nutzer ausgewählt hat (siehe Preisrahmen weiter unten). Der Preis muss für die vorgeschlagene Dienstleistung und Umsatzniveau sinnvoll sein, aber Premium-Positioniert sein. Der Nutzer soll das Gefühl bekommen, das die Angebotsleiter für ihn ein guter finanzieller Entwicklungsschritt ist, aber nicht unrealistisch wirken.
+Spreche dem Nutzer nicht nach dem Mund. Der Nutzer soll nicht das gefühl bekommen, dass du seine Angaben einfach 1:1 wiedergibst, entwickle seinen Input stattdessen zu einer funktionierenden Angebotsleiter weiter. Nutze und ergänze seine Angaben mit deinem Expertenwissen, damit die Angebotsleiter strategisch sinnvoll und marktfähig ist. Wenn Angaben fehlen oder unklar sind, mach das Beste draus, aber erfinde keine komplett neuen Dienstleistungen, die nicht zum Hauptdienstleistungsbereich passen.
 Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber versuche nicht zu raten oder Dinge zu erfinden, die nicht in den Antworten stehen.
 
 **Angaben:**
