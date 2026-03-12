@@ -85,8 +85,9 @@ export async function POST(req: NextRequest) {
 
   // ── Forward to webhook (Make / Zapier / n8n) ──
   const webhookUrl = process.env.LEAD_WEBHOOK_URL;
+  const webhookDisabled = process.env.DISABLE_LEAD_WEBHOOK === 'true';
 
-  if (webhookUrl) {
+  if (webhookUrl && !webhookDisabled) {
     try {
       const webhookRes = await fetch(webhookUrl, {
         method: "POST",

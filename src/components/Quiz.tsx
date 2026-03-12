@@ -169,7 +169,9 @@ export default function Quiz() {
 
       if (!res.ok) return false;
 
-      trackEvent('Lead', { email, phone });
+      if (answers.q6 !== 'Unter 3.000 €') {
+        trackEvent('Lead', { email, phone });
+      }
       setIsUnlocked(true);
       return true;
     } catch {
