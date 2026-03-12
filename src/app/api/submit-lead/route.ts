@@ -68,6 +68,9 @@ export async function POST(req: NextRequest) {
       monatsumsatz: answers?.q6 ?? "",
       hatFestesAngebot: answers?.q7 ?? "",
     },
+    // AI qualification signals
+    isSpam: result?.isSpam ?? false,
+    isQualified: result?.isQualified ?? true,
     // AI-generated ladder result
     angebotsleiter: result?.steps
       ? result.steps.map((step, i) => ({
