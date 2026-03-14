@@ -8,7 +8,7 @@ import Header from "./Header";
 import ProgressBar from "./ProgressBar";
 
 // ── Replace with your actual video URL ──────────────────────
-const VIDEO_URL = "/platzhalter.mp4";
+const VIDEO_URL = "https://video.funnelcockpit.com/video/user/KbWXtCGXg4wvzrjbE/video-player/5kxYMkhRFLu6yQSSy/1080p.mp4";
 // ────────────────────────────────────────────────────────────
 
 type Screen =
@@ -103,6 +103,7 @@ export default function QuizStart() {
   const [videoProgress, setVideoProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [showSoundHint, setShowSoundHint] = useState(true);
   const resultSectionRef = useRef<HTMLDivElement>(null);
 
   const primaryEl = useRef<HTMLElement | null>(null);
@@ -120,6 +121,7 @@ export default function QuizStart() {
     }
     setUtm(captured);
   }, []);
+
 
   // As soon as API returns: submit full lead (don't wait for video)
   useEffect(() => {
@@ -251,6 +253,7 @@ export default function QuizStart() {
     if (!v) return;
     v.muted = !v.muted;
     setIsMuted(v.muted);
+    if (!v.muted) setShowSoundHint(false);
   };
 
   // ── Enter key navigation ──────────────────────────────────────
@@ -490,6 +493,12 @@ export default function QuizStart() {
                 onPause={handleVideoPause}
                 className="vs-video"
               />
+              {showSoundHint && (
+                <button className="vs-sound-hint" onClick={toggleMute} aria-label="Ton einschalten">
+                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                  Tippen für Ton
+                </button>
+              )}
               <div className="vs-controls">
                 <button className="vs-ctrl-btn" onClick={togglePlay} aria-label={isPlaying ? "Pause" : "Play"}>
                   {isPlaying ? (

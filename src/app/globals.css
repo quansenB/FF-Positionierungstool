@@ -404,7 +404,9 @@ textarea.input-text { resize: vertical; min-height: 100px; }
 .vs-step-badge { display: inline-flex; align-self: center; padding: 0.3rem 0.85rem; background: var(--highlight-light); color: var(--highlight); border-radius: 100px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem; }
 .vs-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; text-align: center; letter-spacing: -0.02em; line-height: 1.25; margin-bottom: 0.6rem; }
 .vs-sub { font-size: 0.9rem; color: var(--text-dim); text-align: center; line-height: 1.5; margin-bottom: 1.5rem; }
-.vs-player-wrap { background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.15); }
+.vs-player-wrap { background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.15); position: relative; }
+.vs-sound-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 0.6rem; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); color: #fff; font-size: 1.05rem; font-weight: 700; padding: 1.25rem 2rem; border-radius: 16px; border: none; cursor: pointer; white-space: nowrap; z-index: 10; animation: fadeUp 0.4s ease; }
+.vs-sound-hint svg { width: 28px; height: 28px; }
 .vs-video { width: 100%; display: block; max-height: 420px; object-fit: cover; }
 .vs-controls { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: #111; }
 .vs-ctrl-btn { background: rgba(255,255,255,0.12); border: none; color: #fff; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 0.15s; }
