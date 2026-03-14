@@ -480,25 +480,27 @@ export default function QuizStart() {
             <h2 className="vs-title">Während dein Ergebnis erstellt wird …</h2>
             <p className="vs-sub">Schau kurz rein – dann erfährst du direkt, wie du deine Angebotsleiter umsetzt.</p>
 
-            <div className="vs-player-wrap">
-              <video
-                ref={videoRef}
-                src={VIDEO_URL}
-                autoPlay
-                muted
-                playsInline
-                onTimeUpdate={handleVideoTimeUpdate}
-                onSeeking={handleVideoSeeking}
-                onPlay={handleVideoPlay}
-                onPause={handleVideoPause}
-                className="vs-video"
-              />
-              {showSoundHint && (
-                <button className="vs-sound-hint" onClick={toggleMute} aria-label="Ton einschalten">
-                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                  Tippen für Ton
-                </button>
-              )}
+            <div className="vs-player-outer">
+              <div className="vs-player-wrap">
+                <video
+                  ref={videoRef}
+                  src={VIDEO_URL}
+                  autoPlay
+                  muted
+                  playsInline
+                  onTimeUpdate={handleVideoTimeUpdate}
+                  onSeeking={handleVideoSeeking}
+                  onPlay={handleVideoPlay}
+                  onPause={handleVideoPause}
+                  className="vs-video"
+                />
+                {showSoundHint && (
+                  <button className="vs-sound-hint" onClick={toggleMute} aria-label="Ton einschalten">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                    Tippen für Ton
+                  </button>
+                )}
+              </div>
               <div className="vs-controls">
                 <button className="vs-ctrl-btn" onClick={togglePlay} aria-label={isPlaying ? "Pause" : "Play"}>
                   {isPlaying ? (
@@ -533,9 +535,7 @@ export default function QuizStart() {
                 <div className="vs-skeleton-status">
                   <div className="vs-skeleton-status-dot" />
                   <span>
-                    {apiDone && !analyzeError
-                      ? "Fertig – schau das Video zu Ende …"
-                      : "Deine Angebotsleiter wird generiert …"}
+                    Deine Angebotsleiter wird generiert …
                   </span>
                 </div>
                 {[1, 2, 3, 4].map((i) => (

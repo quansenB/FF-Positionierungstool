@@ -561,7 +561,6 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
       }
 
       const data = await response.json() as { choices: { message: { content: string } }[] };
-      console.log(`[/api/analyze] Attempt ${attempt} raw response:`, JSON.stringify(data).slice(0, 500));
       const rawContent = data.choices?.[0]?.message?.content;
       if (!rawContent) {
         throw new Error('Empty response from OpenRouter');
@@ -586,8 +585,6 @@ Wenn du generische oder Fake-Antworten bekommst, mach das Beste draus, aber vers
       // Normalise booleans (model may omit them)
       if (typeof result.isSpam !== 'boolean') result.isSpam = false;
       if (typeof result.isQualified !== 'boolean') result.isQualified = true;
-
-      console.log('[/api/analyze] Result:', JSON.stringify({ isSpam: result.isSpam, isQualified: result.isQualified, steps: result.steps.map(s => ({ title: s.title, price: s.price })) }, null, 2));
 
       return NextResponse.json(result);
     } catch (err) {
