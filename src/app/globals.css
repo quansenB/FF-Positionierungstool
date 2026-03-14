@@ -387,6 +387,63 @@ textarea.input-text { resize: vertical; min-height: 100px; }
 .field-error-msg { font-size: 0.78rem; color: var(--highlight); margin-top: 0.5rem; font-weight: 500; }
 .selection-error { outline: 1.5px solid var(--highlight); border-radius: 8px; }
 
+/* ── Email Gate ────────────────────────────────────────────── */
+.email-gate-wrap { display: flex; align-items: center; justify-content: center; flex: 1; padding: 1rem 0; }
+.email-gate-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem 2rem; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.07); display: flex; flex-direction: column; align-items: center; gap: 0; }
+.email-gate-icon-wrap { width: 60px; height: 60px; background: var(--highlight-light); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--highlight); margin-bottom: 1.25rem; }
+.email-gate-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; margin-bottom: 0.6rem; letter-spacing: -0.02em; }
+.email-gate-sub { font-size: 0.9rem; color: var(--text-dim); line-height: 1.5; max-width: 320px; margin-bottom: 1.5rem; }
+.email-gate-trust { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--text-dim); margin-top: 0.75rem; margin-bottom: 1.25rem; }
+.email-gate-dot { width: 7px; height: 7px; border-radius: 50%; background: #34c759; flex-shrink: 0; }
+.email-gate-btn { width: 100%; justify-content: center; }
+.btn-text-muted { background: none; border: none; color: var(--text-dim); font-size: 0.85rem; cursor: pointer; padding: 0.5rem; margin-top: 0.25rem; font-family: inherit; }
+.btn-text-muted:hover { color: var(--text); }
+
+/* ── Video Screen ───────────────────────────────────────────── */
+.video-screen { display: flex; flex-direction: column; gap: 0; }
+.vs-step-badge { display: inline-flex; align-self: center; padding: 0.3rem 0.85rem; background: var(--highlight-light); color: var(--highlight); border-radius: 100px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem; }
+.vs-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; text-align: center; letter-spacing: -0.02em; line-height: 1.25; margin-bottom: 0.6rem; }
+.vs-sub { font-size: 0.9rem; color: var(--text-dim); text-align: center; line-height: 1.5; margin-bottom: 1.5rem; }
+.vs-player-wrap { background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.15); }
+.vs-video { width: 100%; display: block; max-height: 420px; object-fit: cover; }
+.vs-controls { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: #111; }
+.vs-ctrl-btn { background: rgba(255,255,255,0.12); border: none; color: #fff; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 0.15s; }
+.vs-ctrl-btn:hover { background: rgba(255,255,255,0.2); }
+.vs-progress-track { flex: 1; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; cursor: default; }
+.vs-progress-fill { height: 100%; background: var(--highlight); border-radius: 2px; transition: width 0.3s linear; }
+.vs-connector { display: flex; justify-content: center; padding: 1.25rem 0; }
+.vs-result-section { opacity: 0; pointer-events: none; transform: translateY(12px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.vs-result-section.vs-result-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+/* Booking CTA banner (QuizStart result reveal) */
+.vs-booking-cta { display: flex; align-items: center; gap: 1.25rem; background: var(--highlight); border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem; }
+.vs-booking-cta-text { flex: 1; }
+.vs-booking-cta-title { font-weight: 700; font-size: 0.95rem; color: #fff; margin-bottom: 0.25rem; line-height: 1.3; }
+.vs-booking-cta-sub { font-size: 0.8rem; color: rgba(255,255,255,0.8); line-height: 1.4; }
+.vs-booking-cta-btn { background: #fff !important; color: var(--highlight) !important; white-space: nowrap; flex-shrink: 0; text-decoration: none; font-size: 0.85rem; padding: 0.65rem 1.1rem; }
+.vs-booking-cta-btn:hover { background: rgba(255,255,255,0.9) !important; }
+@media (max-width: 520px) { .vs-booking-cta { flex-direction: column; align-items: flex-start; } .vs-booking-cta-btn { width: 100%; justify-content: center; } }
+
+/* Skeleton shimmer */
+@keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+.vs-skel { border-radius: 6px; background: linear-gradient(90deg, var(--border) 25%, #e8e7e5 50%, var(--border) 75%); background-size: 800px 100%; animation: shimmer 1.5s infinite linear; }
+.vs-skel--title  { height: 22px; width: 55%; margin: 0 auto 0.5rem; }
+.vs-skel--sub    { height: 14px; width: 75%; margin: 0 auto; }
+.vs-skel--label  { height: 11px; width: 45%; margin-bottom: 0.5rem; }
+.vs-skel--heading{ height: 18px; width: 70%; margin-bottom: 0.6rem; }
+.vs-skel--line   { height: 12px; width: 100%; margin-bottom: 0.35rem; }
+.vs-skel--short  { width: 65%; }
+.vs-skel--price  { height: 14px; width: 30%; margin-top: 0.5rem; border-radius: 100px; }
+
+/* Skeleton wrapper */
+.vs-skeleton-wrap { display: flex; flex-direction: column; gap: 0; }
+.vs-skeleton-header { text-align: center; margin-bottom: 1rem; }
+.vs-skeleton-status { display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-dim); font-weight: 500; margin-bottom: 1.5rem; }
+.vs-skeleton-status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--highlight); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.vs-skeleton-step { display: flex; gap: 1rem; align-items: flex-start; position: relative; margin-bottom: 1rem; }
+.vs-skeleton-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--border); flex-shrink: 0; margin-top: 0.35rem; }
+.vs-skeleton-card { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; }
+
 @media (max-width: 480px) {
   .intro h1 { font-size: 1.6rem; }
   .intro-features { flex-direction: column; gap: 0.6rem; align-items: center; }

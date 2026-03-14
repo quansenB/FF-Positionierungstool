@@ -302,7 +302,7 @@ export default function Quiz() {
               <p>
                 6 Fragen. Dein individueller Entwurf für eine Angebotsleiter,
                 mit der du planbarer verkaufst und höhere Preise durchsetzt.
-                Entwickelt für Selbststädnige aus Design, Development und
+                Entwickelt für Selbstständige aus Design, Development und
                 Marketing.
               </p>
               <div className="intro-features">
