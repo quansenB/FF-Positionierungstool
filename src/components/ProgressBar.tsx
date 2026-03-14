@@ -1,18 +1,15 @@
 interface Props {
-  current: number;
-  total: number;
+  percent: number;
 }
 
-export default function ProgressBar({ current, total }: Props) {
-  const pct = (current / total) * 100;
-
+export default function ProgressBar({ percent }: Props) {
   return (
     <div className="progress-wrap">
       <div className="progress-bar">
-        <div className="progress-fill" style={{ width: `${pct}%` }} />
+        <div className="progress-fill" style={{ width: `${percent}%` }} />
       </div>
-      <div className="progress-label">
-        Frage {current} von {total}
+      <div className="progress-label" style={{ width: `${percent}%`, textAlign: "right" }}>
+        {percent}%
       </div>
     </div>
   );

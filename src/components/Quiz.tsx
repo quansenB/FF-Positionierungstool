@@ -20,8 +20,6 @@ type Screen =
   | "loading"
   | "result";
 
-const Q_SCREENS: Screen[] = ["q1", "q3", "q4", "q5", "q6", "q7"];
-const TOTAL_Q = 6;
 
 const REVENUE_OPTIONS = [
   "Unter 3.000 €",
@@ -270,16 +268,24 @@ export default function Quiz() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [screen, answers]);
 
-  const progressIndex = Q_SCREENS.indexOf(screen as (typeof Q_SCREENS)[number]);
-  const showProgress = progressIndex >= 0;
+  const progressPct: Record<Screen, number | null> = {
+    intro: null,
+    q1: 50,
+    q3: 55,
+    q4: 60,
+    q5: 65,
+    q6: 70,
+    q7: 75,
+    loading: 80,
+    result: isUnlocked ? 95 : 85,
+  };
+  const currentPct = progressPct[screen];
 
   // ── Render ──────────────────────────────────────────────────
   return (
     <div className="app">
       <Header />
-      {showProgress && (
-        <ProgressBar current={progressIndex + 1} total={TOTAL_Q} />
-      )}
+      {currentPct !== null && <ProgressBar percent={currentPct} />}
 
       <div key={screenKey}>
         {/* ── Intro ── */}
